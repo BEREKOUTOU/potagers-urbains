@@ -1,74 +1,101 @@
-# Welcome to your Lovable project
+# Green City Grow Hub
 
-## Project info
+An urban gardening platform that connects city dwellers with local gardens, fosters community collaboration, and promotes sustainable urban agriculture through technology and shared resources.
 
-**URL**: https://lovable.dev/projects/f1a4057a-c716-434a-a8fe-ab7fb9267d13
+## 🌱 Features
 
-## How can I edit this code?
+- **Garden Discovery & Management**: Browse, join, and manage urban gardens in your area
+- **Community Collaboration**: Connect with fellow gardeners, share tips, and participate in discussions
+- **AI-Powered Features**: Get intelligent recommendations for gardening practices
+- **Resource Sharing**: Access tools, guides, and educational content
+- **Garden Statistics**: Track and analyze garden performance and growth metrics
+- **User Profiles**: Manage your gardening profile and contributions
+- **Responsive Design**: Optimized for desktop and mobile devices
 
-There are several ways of editing your application.
+## 🛠 Tech Stack
 
-**Use Lovable**
+- **Frontend**: React 18 with TypeScript
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS with shadcn/ui components
+- **Routing**: React Router DOM
+- **State Management**: TanStack Query (React Query)
+- **Form Handling**: React Hook Form with Zod validation
+- **UI Components**: Radix UI primitives
+- **Icons**: Lucide React
+- **Charts**: Recharts
+- **Date Handling**: date-fns
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/f1a4057a-c716-434a-a8fe-ab7fb9267d13) and start prompting.
+## 🚀 Installation
 
-Changes made via Lovable will be committed automatically to this repo.
+1. **Clone the repository**
 
-**Use your preferred IDE**
+   ```bash
+   git clone <repository-url>
+   cd green-city-grow-hub-main
+   ```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+2. **Install dependencies**
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+   ```bash
+   npm install
+   ```
 
-Follow these steps:
+3. **Start the development server**
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+   ```bash
+   npm run dev
+   ```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+4. **Open your browser**
+   Navigate to `http://localhost:5173` (or the port shown in your terminal)
 
-# Step 3: Install the necessary dependencies.
-npm i
+## 📜 Available Scripts
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+- `npm run dev` - Start the development server
+- `npm run build` - Build the project for production
+- `npm run build:dev` - Build the project in development mode
+- `npm run lint` - Run ESLint for code linting
+- `npm run preview` - Preview the production build locally
 
-**Edit a file directly in GitHub**
+## 📁 Project Structure
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+``
+src/
+├── components/          # Reusable UI components
+│   ├── ui/             # shadcn/ui components
+│   └── ...             # Feature-specific components
+├── pages/              # Page components
+├── hooks/              # Custom React hooks
+├── lib/                # Utility functions
+├── data/               # Static data and mock data
+└── assets/             # Images and static assets
+``
 
-**Use GitHub Codespaces**
+## 🌟 Key Components
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- **HeroSection**: Landing page hero with call-to-action
+- **GardensGrid**: Display grid of available gardens
+- **DashboardCards**: User dashboard with quick actions
+- **Community**: Discussion forums and community features
+- **Resources**: Educational content and gardening resources
+- **StatsSection**: Analytics and statistics display
 
-## What technologies are used for this project?
+## 🤝 Contributing
 
-This project is built with:
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 📄 License
 
-## How can I deploy this project?
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-Simply open [Lovable](https://lovable.dev/projects/f1a4057a-c716-434a-a8fe-ab7fb9267d13) and click on Share -> Publish.
+## 📞 Contact
 
-## Can I connect a custom domain to my Lovable project?
+For questions or support, please open an issue on GitHub.
 
-Yes, you can!
+---
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
-# potagers-urbains
+*Empowering urban communities to grow together, one garden at a time.*
