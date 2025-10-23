@@ -32,6 +32,10 @@ import garden2 from "@/assets/garden-2.jpg";
 import garden3 from "@/assets/garden-3.jpg";
 import garden4 from "@/assets/garden-4.jpg";
 
+import Atelier from "@/assets/Atelier_Permaculture_urbaine.jpg";
+import troc from "@/assets/Grand_Troc_Graines_Automne.jpg";
+import visite from "@/assets/Visite_guidée_Jardin_sur_toit.jpg";
+
 const forumCategories = [
   {
     icons: "🌱",
@@ -133,6 +137,7 @@ const questions = [
 
 const events = [
   {
+    Image: Atelier,
     title: "Atelier Permaculture urbaine",
     date: "15 Nov 2024",
     time: "14h00",
@@ -142,6 +147,7 @@ const events = [
     category: "Atelier"
   },
   {
+    Image: troc,
     title: "Grand Troc de Graines d'Automne",
     date: "17 Nov 2024",
     time: "10h00",
@@ -151,6 +157,7 @@ const events = [
     category: "Événement"
   },
   {
+    Image: visite,
     title: "Visite guidée - Jardin sur toit",
     date: "20 Nov 2024",
     time: "16h00",
@@ -158,6 +165,16 @@ const events = [
     participants: 15,
     maxParticipants: 20,
     category: "Visite"
+  },
+  {
+    Image: garden4,
+    title: "Atelier de jardinage urbain",
+    date: "25 Nov 2024",
+    time: "14h00",
+    location: "Paris 12e",
+    participants: 10,
+    maxParticipants: 15,
+    category: "Atelier"
   }
 ];
 
@@ -479,10 +496,15 @@ const sections = [
                     </Button>
                   </div>
 
-                  <div className="space-y-4">
+                  <div className="space-y-4  grid grid-cols-1 md:grid-cols-2 gap-4">
                     {events.map((event, index) => (
                       <Card key={index} className="border-none shadow-lg">
                         <CardHeader>
+                          <img
+                            src={event.Image}
+                            alt={event.title}
+                            className="w-full h-40 object-cover mb-4 rounded-md"
+                          />
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-2">
@@ -589,19 +611,19 @@ const sections = [
                   <CardTitle className="text-lg">Actions Rapides</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  <Button className="w-full justify-start" variant="outline">
+                  <Button className="w-full justify-start  bg-green-600 text-white" variant="outline">
                     <Plus className="mr-2 h-4 w-4" />
                     Créer une discussion
                   </Button>
-                  <Button className="w-full justify-start" variant="outline">
+                  <Button className="w-full justify-start bg-blue-600 text-white" variant="outline">
                     <ImageIcon className="mr-2 h-4 w-4" />
                     Partager une photo
                   </Button>
-                  <Button className="w-full justify-start" variant="outline">
+                  <Button className="w-full justify-start bg-purple-600 text-white" variant="outline">
                     <Calendar className="mr-2 h-4 w-4" />
                     Créer un événement
                   </Button>
-                  <Button className="w-full justify-start" variant="outline">
+                  <Button className="w-full justify-start bg-pink-600 text-white" variant="outline">
                     <Users className="mr-2 h-4 w-4" />
                     Rejoindre un groupe
                   </Button>
