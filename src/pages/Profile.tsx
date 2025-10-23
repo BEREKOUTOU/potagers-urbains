@@ -403,25 +403,32 @@ const Profile = () => {
                 </Button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[1, 2, 3].map((garden) => (
-                  <Card key={garden}>
-                    <CardContent className="p-0">
-                      <img src={`/assets/garden-${garden}.jpg`} alt={`Jardin ${garden}`} className="w-full h-48 object-cover rounded-t-lg" />
-                      <div className="p-4">
-                        <h3 className="font-semibold mb-2">Jardin Balcon {garden}</h3>
-                        <div className="flex items-center gap-2 mb-2">
-                          <Badge variant="secondary">Balcon</Badge>
-                          <Badge variant="outline">Actif</Badge>
+                {[1, 2, 3].map((garden) => {
+                  const gardenImages = ['Jardin_Balcon.jpg', 'Jardin_Balcon2.jpg', 'Jardin-Balcon2.jpg'];
+                  return (
+                    <Card key={garden}>
+                      <CardContent className="p-0">
+                        <div className="grid grid-cols-3 gap-1">
+                          {gardenImages.map((img, idx) => (
+                            <img key={idx} src={`/assets/${img}`} alt={`Jardin ${idx - 2}`} className="w-full h-32 object-cover rounded-t-lg" />
+                          ))}
                         </div>
-                        <p className="text-sm text-muted-foreground mb-4">Créé le 15 mars 2024</p>
-                        <Button className="w-full">
-                          <Sprout className="h-4 w-4 mr-2" />
-                          Accéder
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                        <div className="p-4">
+                          <h3 className="font-semibold mb-2">Jardin Balcon {garden}</h3>
+                          <div className="flex items-center gap-2 mb-2">
+                            <Badge variant="secondary">Balcon</Badge>
+                            <Badge variant="outline">Actif</Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground mb-4">Créé le 15 mars 2024</p>
+                          <Button className="w-full">
+                            <Sprout className="h-4 w-4 mr-2" />
+                            Accéder
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
             </TabsContent>
 
