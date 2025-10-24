@@ -6,6 +6,7 @@ import GardensGrid from "@/components/GardensGrid";
 import TestimonialsSection from "@/components/TestimonialsSection";
 import StatsSection from "@/components/StatsSection";
 import Footer from "@/components/Footer";
+import BackToTop from "@/components/BackToTop";
 
 const Index = () => {
   return (
@@ -20,6 +21,7 @@ const Index = () => {
         <StatsSection />
       </main>
       <Footer />
+      <BackToTop />
     </div>
   );
 };

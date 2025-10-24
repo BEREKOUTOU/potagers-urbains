@@ -12,6 +12,7 @@ import { MapPin, Users, Star, ArrowLeft, Download, CheckCircle } from "lucide-re
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { gardens } from "@/data/gardens";
+import BackToTop from "@/components/BackToTop";
 
 const JoinGarden = (): JSX.Element => {
   const { id } = useParams<{ id: string }>();
@@ -401,6 +402,7 @@ En cas de non-respect répété, l'accès au jardin pourra être suspendu.
       </section>
 
       <Footer />
+      <BackToTop />
     </div>
   );
 };

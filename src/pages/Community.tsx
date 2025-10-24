@@ -1,6 +1,7 @@
 import { Sprout} from "lucide-react"; // {Sprout}
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import BackToTop from "@/components/BackToTop";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -658,6 +659,7 @@ const sections = [
       </main>
 
       <Footer />
+      <BackToTop />
     </div>
   );
 };

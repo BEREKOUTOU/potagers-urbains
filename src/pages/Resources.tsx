@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar } from "@/components/ui/calendar";
+import BackToTop from "@/components/BackToTop";
 import img from '../assets/img.jpg';
 import img0 from '../assets/img0.jpg';
 import img1 from '../assets/img1.jpg';
@@ -688,6 +689,7 @@ const Resources = () => {
       </main>
 
       <Footer />
+      <BackToTop />
     </div>
   );
 };

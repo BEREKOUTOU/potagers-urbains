@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import BackToTop from "@/components/BackToTop";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -489,6 +490,7 @@ const NewDiscussion = () => {
       </main>
 
       <Footer />
+      <BackToTop />
     </div>
   );
 };

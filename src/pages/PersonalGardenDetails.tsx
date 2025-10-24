@@ -45,6 +45,7 @@ import {
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import BackToTop from "@/components/BackToTop";
 
 // Mock data for personal garden details
 const personalGardens = [
@@ -717,6 +718,7 @@ const PersonalGardenDetails = (): JSX.Element => {
       </div>
 
       <Footer />
+      <BackToTop />
     </div>
   );
 };

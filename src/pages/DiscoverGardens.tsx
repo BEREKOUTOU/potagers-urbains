@@ -14,6 +14,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { gardens, type Garden } from "@/data/gardens";
 import { useNavigate } from "react-router-dom";
+import BackToTop from "@/components/BackToTop";
 
 const DiscoverGardens = (): JSX.Element => {
   const navigate = useNavigate();
@@ -369,6 +370,7 @@ const DiscoverGardens = (): JSX.Element => {
       </section>
 
       <Footer />
+      <BackToTop />
     </div>
   );
 };
