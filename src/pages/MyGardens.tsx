@@ -272,10 +272,12 @@ const MyGardens = () => {
                       Modifier
                     </Button>
                   </Link>
-                  <Button variant="outline" size="sm" className="flex-1">
-                    <BarChart3 className="mr-2 h-4 w-4" />
-                    Stats
-                  </Button>
+                  <Link to={`/mes-jardins/stats/${garden.id}`}>
+                    <Button variant="outline" size="sm" className="flex-1">
+                      <BarChart3 className="mr-2 h-4 w-4" />
+                      Stats
+                    </Button>
+                  </Link>
                 </CardFooter>
               </Card>
             ))}

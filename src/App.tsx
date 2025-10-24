@@ -37,6 +37,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/mes-jardins" element={<MyGardens />} />
             <Route path="/mes-jardins/details/:id" element={<PersonalGardenDetails />} />
+            <Route path="/mes-jardins/stats/:id" element={<GardenStats />} />
             <Route path="/mes-jardins/ajouter" element={<AddNewGarden />} />
             <Route path="/mes-jardins/editer/:id" element={<EditGarden />} />
             <Route path="/communaute" element={<Community />} />

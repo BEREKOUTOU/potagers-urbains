@@ -59,7 +59,28 @@ const GardenStats = (): JSX.Element => {
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
 
-  const garden = gardens.find(g => g.id === parseInt(id || "0"));
+  // Mock data for personal gardens
+  const personalGardens = [
+    {
+      id: 1,
+      name: "Mon Potager Balcon",
+      location: "Paris 11ème",
+      image: "/assets/Jardin_Balcon.jpg",
+      status: "active",
+      description: "Mon petit jardin urbain sur le balcon avec tomates, basilic et herbes aromatiques.",
+      createdDate: "2023-03-15",
+      area: "8 m²",
+      soilType: "Terreau universel",
+      iot: {
+        temperature: 24,
+        humidity: 68,
+        ph: 6.5,
+        light: 85
+      }
+    }
+  ];
+
+  const garden = personalGardens.find(g => g.id === parseInt(id || "0"));
 
   if (!garden) {
     return (
@@ -67,8 +88,8 @@ const GardenStats = (): JSX.Element => {
         <Header />
         <div className="container mx-auto px-4 py-20 text-center">
           <h1 className="text-2xl font-bold mb-4">Jardin non trouvé</h1>
-          <Button onClick={() => navigate("/decouvrir-jardins")}>
-            Retour aux jardins
+          <Button onClick={() => navigate("/mes-jardins")}>
+            Retour à mes jardins
           </Button>
         </div>
         <Footer />
@@ -135,9 +156,9 @@ const GardenStats = (): JSX.Element => {
       <section className="bg-muted/30 py-6">
         <div className="container mx-auto px-4">
           <div className="flex items-center gap-4 mb-4">
-            <Button variant="outline" size="sm" onClick={() => navigate("/decouvrir-jardins")}>
+            <Button variant="outline" size="sm" onClick={() => navigate("/mes-jardins")}>
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Retour aux jardins
+              Retour à mes jardins
             </Button>
             <div className="flex items-center gap-2">
               <BarChart3 className="h-5 w-5" />
