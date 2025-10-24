@@ -260,10 +260,12 @@ const MyGardens = () => {
                 </CardContent>
 
                 <CardFooter className="flex gap-2 border-t pt-4">
-                  <Button variant="outline" size="sm" className="flex-1">
-                    <Eye className="mr-2 h-4 w-4" />
-                    Détails
-                  </Button>
+                  <Link to={`/mes-jardins/details/${garden.id}`}>
+                    <Button variant="outline" size="sm" className="flex-1">
+                      <Eye className="mr-2 h-4 w-4" />
+                      Détails
+                    </Button>
+                  </Link>
                   <Link to={`/mes-jardins/editer/${garden.id}`}>
                     <Button variant="outline" size="sm" className="flex-1">
                       <Settings className="mr-2 h-4 w-4" />

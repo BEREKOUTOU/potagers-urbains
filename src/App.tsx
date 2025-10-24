@@ -22,6 +22,7 @@ const AddNewGarden = lazy(() => import("./pages/AddNewGarden"));
 const EditGarden = lazy(() => import("./pages/EditGarden"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const GardenStats = lazy(() => import("./pages/GardenStats"));
+const PersonalGardenDetails = lazy(() => import("./pages/PersonalGardenDetails"));
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/mes-jardins" element={<MyGardens />} />
+            <Route path="/mes-jardins/details/:id" element={<PersonalGardenDetails />} />
             <Route path="/mes-jardins/ajouter" element={<AddNewGarden />} />
             <Route path="/mes-jardins/editer/:id" element={<EditGarden />} />
             <Route path="/communaute" element={<Community />} />
