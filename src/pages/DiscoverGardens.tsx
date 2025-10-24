@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Sprout, MapPin, Users, Star, Search, Filter, Grid, List, Plus, Leaf, Carrot, Flower, Apple, Award, TrendingUp, Users2, Calendar, BarChart } from "lucide-react";
+import { Sprout, MapPin, Users, Star, Search, Filter, Grid, List, Plus, Leaf, Carrot, Flower, Apple, Award, TrendingUp, Users2, Calendar, BarChart3 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { gardens, type Garden } from "@/data/gardens";
@@ -115,7 +115,8 @@ const DiscoverGardens = (): JSX.Element => {
             En savoir plus
           </Button>
           <Button variant="outline" size="sm" onClick={() => navigate(`/jardin-stats/${garden.id}`)}>
-            <BarChart className="h-4 w-4" />
+            <BarChart3 className="h-4 w-4" />
+            Stats
           </Button>
         </div>
       </CardContent>
