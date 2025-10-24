@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import BackToTop from "@/components/BackToTop";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Sprout, User, Mail, Lock, MapPin, Eye, EyeOff } from "lucide-react";
@@ -289,6 +290,7 @@ const Signup = () => {
           </Card>
         </div>
       </main>
+      <BackToTop />
     </div>
   );
 };
