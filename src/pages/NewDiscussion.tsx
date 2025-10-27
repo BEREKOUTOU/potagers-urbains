@@ -52,7 +52,7 @@ const NewDiscussion = () => {
     category: "",
     content: "",
     tags: "",
-    isUrgent: false,
+    privacy: "public",
     images: [] as File[]
   });
 
@@ -71,10 +71,22 @@ const NewDiscussion = () => {
   }, []);
 
   const categories = [
-    { value: "debutants", label: "Débutants", description: "Questions et conseils pour bien démarrer" },
-    { value: "techniques-avancees", label: "Techniques avancées", description: "Permaculture, aquaponie et innovations" },
-    { value: "problemes-courants", label: "Problèmes courants", description: "Maladies, parasites et solutions" },
-    { value: "partage-experiences", label: "Partage d'expériences", description: "Vos réussites et apprentissages" }
+    { value: "plantation", label: "Plantation", description: "Semis, repiquage et plantation" },
+    { value: "arrosage", label: "Arrosage", description: "Techniques d'arrosage et irrigation" },
+    { value: "maladies", label: "Maladies", description: "Diagnostic et traitement des maladies" },
+    { value: "recolte", label: "Récolte", description: "Moment et techniques de récolte" },
+    { value: "entretien", label: "Entretien", description: "Taille, fertilisation et maintenance" },
+    { value: "autres", label: "Autres", description: "Questions diverses sur le jardinage urbain" }
+  ];
+
+  const privacyOptions = [
+    { value: "public", label: "Public", description: "Visible par tous les membres" },
+    { value: "members", label: "Membres seulement", description: "Visible par les membres connectés" },
+    { value: "local", label: "Groupe local", description: "Visible par votre groupe local" }
+  ];
+
+  const suggestedTags = [
+    "débutant", "avancé", "tomates", "salades", "herbes aromatiques", "compost", "permaculture", "balcon", "terrasse"
   ];
 
   const handleInputChange = (field: string, value: string | boolean | File[]) => {
@@ -138,10 +150,9 @@ const NewDiscussion = () => {
                     {selectedCategory.label}
                   </Badge>
                 )}
-                {formData.isUrgent && (
-                  <Badge variant="destructive" className="flex items-center gap-1">
-                    <AlertTriangle className="h-3 w-3" />
-                    Urgent
+                {formData.privacy !== "public" && (
+                  <Badge variant="secondary" className="flex items-center gap-1">
+                    {formData.privacy === "members" ? "Membres" : "Groupe local"}
                   </Badge>
                 )}
               </div>
@@ -335,19 +346,46 @@ const NewDiscussion = () => {
         <p className="text-sm text-muted-foreground">
           Les tags aident les autres membres à trouver votre discussion
         </p>
+        <div className="flex flex-wrap gap-2 mt-2">
+          <span className="text-sm text-muted-foreground">Suggestions :</span>
+          {suggestedTags.map((tag, index) => (
+            <Badge
+              key={index}
+              variant="outline"
+              className="cursor-pointer hover:bg-primary/10"
+              onClick={() => {
+                const currentTags = formData.tags ? formData.tags.split(',').map(t => t.trim()) : [];
+                if (!currentTags.includes(tag)) {
+                  handleInputChange('tags', [...currentTags, tag].join(', '));
+                }
+              }}
+            >
+              #{tag}
+            </Badge>
+          ))}
+        </div>
       </div>
 
-      {/* Urgent */}
-      <div className="flex items-center space-x-2">
-        <Checkbox
-          id="urgent"
-          checked={formData.isUrgent}
-          onCheckedChange={(checked) => handleInputChange('isUrgent', checked)}
-        />
-        <Label htmlFor="urgent" className="flex items-center gap-2">
-          <AlertTriangle className="h-4 w-4 text-destructive" />
-          Marquer comme urgent
+      {/* Privacy */}
+      <div className="space-y-2">
+        <Label htmlFor="privacy" className="text-base font-medium">
+          Confidentialité
         </Label>
+        <Select value={formData.privacy} onValueChange={(value) => handleInputChange('privacy', value)}>
+          <SelectTrigger>
+            <SelectValue placeholder="Choisissez la confidentialité" />
+          </SelectTrigger>
+          <SelectContent>
+            {privacyOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                <div>
+                  <div className="font-medium">{option.label}</div>
+                  <div className="text-sm text-muted-foreground">{option.description}</div>
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );
@@ -478,9 +516,19 @@ const NewDiscussion = () => {
               Sauvegarder en brouillon
             </Button>
             <Button
+              variant="outline"
+              asChild
+              className="flex items-center gap-2"
+            >
+              <RouterLink to="/communaute">
+                <X className="h-4 w-4" />
+                Annuler
+              </RouterLink>
+            </Button>
+            <Button
               onClick={handlePublish}
               disabled={!isFormValid()}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 bg-primary hover:bg-primary/90"
             >
               <Send className="h-4 w-4" />
               Publier la discussion
