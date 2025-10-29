@@ -24,6 +24,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const GardenStats = lazy(() => import("./pages/GardenStats"));
 const PersonalGardenDetails = lazy(() => import("./pages/PersonalGardenDetails"));
 const CreateEvent = lazy(() => import("./pages/CreateEvent"));
+const SharePhoto = lazy(() => import("./pages/SharePhoto"));
 
 const queryClient = new QueryClient();
 
@@ -43,6 +44,7 @@ const App = () => (
             <Route path="/mes-jardins/editer/:id" element={<EditGarden />} />
             <Route path="/communaute" element={<Community />} />
             <Route path="/communaute/nouvelle-discussion" element={<NewDiscussion />} />
+            <Route path="/communaute/partager-photo" element={<SharePhoto />} />
             <Route path="/ressources" element={<Resources />} />
             <Route path="/evenements/creer" element={<CreateEvent />} />
             <Route path="/profil" element={<Profile />} />

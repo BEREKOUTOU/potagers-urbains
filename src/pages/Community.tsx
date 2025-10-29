@@ -620,7 +620,7 @@ const sections = [
                   </Button>
                   <Button className="w-full justify-start bg-blue-600 text-white" variant="outline">
                     <ImageIcon className="mr-2 h-4 w-4" />
-                    <Link to="/communaute/galerie">
+                    <Link to="/communaute/partager-photo">
                     Partager une photo
                     </Link>
                   </Button>
