@@ -30,8 +30,29 @@ import {
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 
+interface EventFormData {
+  title: string;
+  date: Date | undefined;
+  time: string;
+  location: string;
+  description: string;
+  category: string;
+  capacity: string;
+  image: File | null;
+}
+
+interface FormErrors {
+  title?: string;
+  date?: string;
+  time?: string;
+  location?: string;
+  description?: string;
+  category?: string;
+  capacity?: string;
+}
+
 const CreateEvent = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<EventFormData>({
     title: "",
     date: undefined,
     time: "",
@@ -42,8 +63,8 @@ const CreateEvent = () => {
     image: null
   });
 
-  const [imagePreview, setImagePreview] = useState(null);
-  const [errors, setErrors] = useState({});
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [errors, setErrors] = useState<FormErrors>({});
 
   const categories = [
     { value: "atelier", label: "Atelier" },
@@ -64,13 +85,13 @@ const CreateEvent = () => {
     if (file) {
       setFormData(prev => ({ ...prev, image: file }));
       const reader = new FileReader();
-      reader.onload = () => setImagePreview(reader.result);
+      reader.onload = () => setImagePreview(reader.result as string);
       reader.readAsDataURL(file);
     }
   };
 
   const validateForm = () => {
-    const newErrors = {};
+    const newErrors: Record<string, string> = {};
     if (!formData.title.trim()) newErrors.title = "Le titre est requis";
     if (!formData.date) newErrors.date = "La date est requise";
     if (!formData.time.trim()) newErrors.time = "L'heure est requise";

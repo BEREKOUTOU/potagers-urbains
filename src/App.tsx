@@ -23,6 +23,7 @@ const EditGarden = lazy(() => import("./pages/EditGarden"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const GardenStats = lazy(() => import("./pages/GardenStats"));
 const PersonalGardenDetails = lazy(() => import("./pages/PersonalGardenDetails"));
+const CreateEvent = lazy(() => import("./pages/CreateEvent"));
 
 const queryClient = new QueryClient();
 
@@ -43,6 +44,7 @@ const App = () => (
             <Route path="/communaute" element={<Community />} />
             <Route path="/communaute/nouvelle-discussion" element={<NewDiscussion />} />
             <Route path="/ressources" element={<Resources />} />
+            <Route path="/evenements/creer" element={<CreateEvent />} />
             <Route path="/profil" element={<Profile />} />
             <Route path="/inscription" element={<Signup />} />
             <Route path="/connexion" element={<Login />} />

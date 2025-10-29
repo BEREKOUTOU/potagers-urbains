@@ -614,19 +614,27 @@ const sections = [
                 <CardContent className="space-y-2">
                   <Button className="w-full justify-start  bg-green-600 text-white" variant="outline">
                     <Plus className="mr-2 h-4 w-4" />
+                    <Link to="/communaute/nouvelle-discussion">
                     Créer une discussion
+                    </Link>
                   </Button>
                   <Button className="w-full justify-start bg-blue-600 text-white" variant="outline">
                     <ImageIcon className="mr-2 h-4 w-4" />
+                    <Link to="/communaute/galerie">
                     Partager une photo
+                    </Link>
                   </Button>
                   <Button className="w-full justify-start bg-purple-600 text-white" variant="outline">
                     <Calendar className="mr-2 h-4 w-4" />
+                    <Link to="/evenements/creer">
                     Créer un événement
+                    </Link>
                   </Button>
                   <Button className="w-full justify-start bg-pink-600 text-white" variant="outline">
                     <Users className="mr-2 h-4 w-4" />
+                    <Link to="/rejoindre-jardin/1">
                     Rejoindre un groupe
+                    </Link>
                   </Button>
                 </CardContent>
               </Card>
