@@ -55,10 +55,12 @@ import {
   Info
 } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Resources = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("Tous");
+  const navigate = useNavigate();
 
   const guides = [
     {
@@ -353,7 +355,7 @@ const Resources = () => {
                           </div>
                         </CardHeader>
                         <CardFooter>
-                          <Button className="w-full">Lire le guide</Button>
+                          <Button className="w-full" onClick={() => navigate(`/guide/${encodeURIComponent(guide.title.toLowerCase().replace(/\s+/g, '-'))}`)}>Lire le guide</Button>
                         </CardFooter>
                       </Card>
                     ))}
