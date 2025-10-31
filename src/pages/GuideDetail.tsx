@@ -8,6 +8,22 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import BackToTop from "@/components/BackToTop";
+import guide from "@/assets/guide.jpg";
+import Arrosoir from "@/assets/Arrosoir.jpg";
+import Grelinette from "@/assets/Grelinette.jpg";
+import GantsDeJardinage from "@/assets/Gants_de_jardinage.jpg";
+import img0 from "@/assets/img0.jpg";
+import img1 from "@/assets/img1.jpg";
+import Bac from "@/assets/Bac_potager_80x40cm.jpg";
+import Pots from "@/assets/Pots_en_terre_cuite.jpg";
+import Tomate from "@/assets/tomate.jpg";
+import Radis from "@/assets/radis.jpg";
+import Basilic from "@/assets/basilic.jpg";
+import Garden1 from "@/assets/garden-1.jpg";
+import Garden2 from "@/assets/garden-2.jpg";
+import Arrosage from "@/assets/Arrosage_goutte_goutte.jpg";
+import Programmateur from "@/assets/Programmateur_automatique.jpg";
+import Capteur from "@/assets/capteur-d-humidite-du-sol.webp";
 import {
   ArrowLeft,
   Clock,
@@ -44,7 +60,7 @@ const guideData = {
   author: "Marie Dubois",
   publishedDate: "15 décembre 2024",
   downloads: 1250,
-  coverImage: "/assets/img.jpg",
+  coverImage: guide,
   chapters: [
     { id: "introduction", title: "Introduction", icon: BookOpen },
     { id: "emplacement", title: "Choisir l'emplacement", icon: Sun },
@@ -260,8 +276,8 @@ const GuideDetail = () => {
                   </p>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                    <img src="/assets/img0.jpg" alt="Balcon ensoleillé" className="w-full h-48 object-cover rounded-lg" />
-                    <img src="/assets/img1.jpg" alt="Jardin sur toit" className="w-full h-48 object-cover rounded-lg" />
+                    <img src={img0} alt="Balcon ensoleillé" className="w-full h-48 object-cover rounded-lg" />
+                    <img src={img1} alt="Jardin sur toit" className="w-full h-48 object-cover rounded-lg" />
                   </div>
 
                   <h3 className="text-xl font-semibold mb-4">Critères essentiels</h3>
@@ -315,7 +331,7 @@ const GuideDetail = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
                     <Card>
                       <CardHeader>
-                        <img src="/assets/Grelinette.jpg" alt="Grelinette" className="w-full h-32 object-cover rounded-lg mb-4" />
+                        <img src={Grelinette} alt="Grelinette" className="w-full h-32 object-cover rounded-lg mb-4" />
                         <CardTitle className="text-base">Grelinette</CardTitle>
                       </CardHeader>
                       <CardContent>
@@ -326,7 +342,7 @@ const GuideDetail = () => {
 
                     <Card>
                       <CardHeader>
-                        <img src="/assets/Arrosoir.jpg" alt="Arrosoir" className="w-full h-32 object-cover rounded-lg mb-4" />
+                        <img src={Arrosoir} alt="Arrosoir" className="w-full h-32 object-cover rounded-lg mb-4" />
                         <CardTitle className="text-base">Arrosoir 10L</CardTitle>
                       </CardHeader>
                       <CardContent>
@@ -337,7 +353,7 @@ const GuideDetail = () => {
 
                     <Card>
                       <CardHeader>
-                        <img src="/assets/Gants_de_jardinage.jpg" alt="Gants de jardinage" className="w-full h-32 object-cover rounded-lg mb-4" />
+                        <img src={GantsDeJardinage} alt="Gants de jardinage" className="w-full h-32 object-cover rounded-lg mb-4" />
                         <CardTitle className="text-base">Gants de jardinage</CardTitle>
                       </CardHeader>
                       <CardContent>
@@ -433,8 +449,8 @@ const GuideDetail = () => {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <img src="/assets/Bac_potager_80x40cm.jpg" alt="Bac potager préparé" className="w-full h-48 object-cover rounded-lg" />
-                    <img src="/assets/Pots_en_terre_cuite.jpg" alt="Pots préparés" className="w-full h-48 object-cover rounded-lg" />
+                    <img src={Bac} alt="Bac potager préparé" className="w-full h-48 object-cover rounded-lg" />
+                    <img src={Pots} alt="Pots préparés" className="w-full h-48 object-cover rounded-lg" />
                   </div>
                 </div>
               </section>
@@ -452,7 +468,7 @@ const GuideDetail = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
                     <Card>
                       <CardHeader>
-                        <img src="/assets/tomate.jpg" alt="Tomates" className="w-full h-32 object-cover rounded-lg mb-4" />
+                        <img src={Tomate} alt="Tomates" className="w-full h-32 object-cover rounded-lg mb-4" />
                         <CardTitle className="text-base">Tomates</CardTitle>
                         <Badge variant="outline">Intermédiaire</Badge>
                       </CardHeader>
@@ -465,7 +481,7 @@ const GuideDetail = () => {
 
                     <Card>
                       <CardHeader>
-                        <img src="/assets/radis.jpg" alt="Radis" className="w-full h-32 object-cover rounded-lg mb-4" />
+                        <img src={Radis} alt="Radis" className="w-full h-32 object-cover rounded-lg mb-4" />
                         <CardTitle className="text-base">Radis</CardTitle>
                         <Badge variant="outline">Facile</Badge>
                       </CardHeader>
@@ -478,7 +494,7 @@ const GuideDetail = () => {
 
                     <Card>
                       <CardHeader>
-                        <img src="/assets/basilic.jpg" alt="Basilic" className="w-full h-32 object-cover rounded-lg mb-4" />
+                        <img src={Basilic} alt="Basilic" className="w-full h-32 object-cover rounded-lg mb-4" />
                         <CardTitle className="text-base">Basilic</CardTitle>
                         <Badge variant="outline">Très facile</Badge>
                       </CardHeader>
@@ -553,8 +569,8 @@ const GuideDetail = () => {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                    <img src="/assets/garden-1.jpg" alt="Plantation de jeunes plants" className="w-full h-48 object-cover rounded-lg" />
-                    <img src="/assets/garden-2.jpg" alt="Plants fraîchement plantés" className="w-full h-48 object-cover rounded-lg" />
+                    <img src={Garden1} alt="Plantation de jeunes plants" className="w-full h-48 object-cover rounded-lg" />
+                    <img src={Garden2} alt="Plants fraîchement plantés" className="w-full h-48 object-cover rounded-lg" />
                   </div>
                 </div>
               </section>
@@ -601,9 +617,9 @@ const GuideDetail = () => {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <img src="/assets/Arrosage_goutte_goutte.jpg" alt="Système goutte à goutte" className="w-full h-32 object-cover rounded-lg" />
-                    <img src="/assets/Programmateur_automatique.jpg" alt="Programmateur automatique" className="w-full h-32 object-cover rounded-lg" />
-                    <img src="/assets/capteur-d-humidite-du-sol.webp" alt="Capteur d'humidité" className="w-full h-32 object-cover rounded-lg" />
+                    <img src={Arrosage} alt="Système goutte à goutte" className="w-full h-32 object-cover rounded-lg" />
+                    <img src={Programmateur} alt="Programmateur automatique" className="w-full h-32 object-cover rounded-lg" />
+                    <img src={Capteur} alt="Capteur d'humidité" className="w-full h-32 object-cover rounded-lg" />
                   </div>
                 </div>
               </section>
