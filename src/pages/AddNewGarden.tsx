@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -119,6 +119,7 @@ const galleryImages = [
 
 const AddNewGarden = () => {
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
     // Basic Info
@@ -252,6 +253,15 @@ const AddNewGarden = () => {
     // In a real app, save to localStorage or API
     localStorage.setItem('gardenDraft', JSON.stringify(formData));
     alert('Brouillon sauvegardé !');
+  };
+
+  // Handle image change
+  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      updateFormData('coverImage', '', imageUrl);
+    }
   };
 
   // Handle create garden
@@ -551,10 +561,17 @@ const AddNewGarden = () => {
                         </div>
                       ))}
                     </div>
-                    <Button variant="outline" className="w-full">
+                    <Button variant="outline" className="w-full" onClick={() => fileInputRef.current?.click()}>
                       <Upload className="h-4 w-4 mr-2" />
                       Importer une image personnalisée
                     </Button>
+                     <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleImageChange}
+                        accept="image/*"
+                        className="hidden"
+                      />
                   </div>
 
                   {/* Theme Color */}
