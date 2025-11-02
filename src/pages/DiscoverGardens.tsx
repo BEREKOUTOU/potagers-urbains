@@ -74,7 +74,7 @@ const DiscoverGardens = (): JSX.Element => {
 
       return true;
     });
-  }, [gardens, searchQuery, selectedLocation, memberRange, selectedCrops, availableOnly]);
+  }, [searchQuery, selectedLocation, memberRange, selectedCrops, availableOnly]);
 
   const recommendedGardens: Garden[] = gardens.slice(0, 3);
 
