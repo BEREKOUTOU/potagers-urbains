@@ -93,6 +93,13 @@ const localGroups = [
     members: 167,
     nextEvent: "Atelier compostage - Mercredi 18h",
     image: garden3
+  },
+  {
+    name: "Paris Sud",
+    arrondissements: "5e, 6e, 7e, 14e, 15e",
+    members: 189,
+    nextEvent: "Échange de plantes - Vendredi 17h",
+    image: garden4
   }
 ];
 
