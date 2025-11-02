@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -24,6 +24,57 @@ const DiscoverGardens = (): JSX.Element => {
   const [selectedCrops, setSelectedCrops] = useState<string[]>([]);
   const [availableOnly, setAvailableOnly] = useState<boolean>(false);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+
+  const filteredGardens = useMemo(() => {
+    return gardens.filter((garden) => {
+      // Search query filter (name or location)
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        if (
+          !garden.name.toLowerCase().includes(query) &&
+          !garden.location.toLowerCase().includes(query)
+        ) {
+          return false;
+        }
+      }
+
+      // Location filter
+      if (selectedLocation && selectedLocation !== "tous") {
+        if (garden.location !== selectedLocation) {
+          return false;
+        }
+      }
+
+      // Member range filter
+      if (garden.members < memberRange[0] || garden.members > memberRange[1]) {
+        return false;
+      }
+
+      // Crop types filter (simple match based on crop names)
+      if (selectedCrops.length > 0) {
+        const hasMatchingCrop = garden.crops.some((crop) => {
+          const cropLower = crop.toLowerCase();
+          return selectedCrops.some((selected) => {
+            if (selected === "legumes") return cropLower.includes("tomate") || cropLower.includes("radis") || cropLower.includes("carotte");
+            if (selected === "herbes") return cropLower.includes("basilic") || cropLower.includes("persil") || cropLower.includes("lavande");
+            if (selected === "fruits") return cropLower.includes("fraise") || cropLower.includes("pomme");
+            if (selected === "fleurs") return cropLower.includes("fleur") || cropLower.includes("rose");
+            return false;
+          });
+        });
+        if (!hasMatchingCrop) {
+          return false;
+        }
+      }
+
+      // Availability filter
+      if (availableOnly && garden.members >= garden.maxMembers) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [gardens, searchQuery, selectedLocation, memberRange, selectedCrops, availableOnly]);
 
   const recommendedGardens: Garden[] = gardens.slice(0, 3);
 
@@ -330,7 +381,7 @@ const DiscoverGardens = (): JSX.Element => {
               </CardHeader>
               <CardContent>
                 <div className={`space-y-4 ${viewMode === "grid" ? "grid grid-cols-2 gap-2" : "space-y-4"}`}>
-                  {gardens.map((garden) => (
+                  {filteredGardens.map((garden) => (
                     <GardenCard key={garden.id} garden={garden} isListView={viewMode === "list"} />
                   ))}
                 </div>
