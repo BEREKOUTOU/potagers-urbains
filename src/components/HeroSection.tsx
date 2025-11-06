@@ -13,7 +13,7 @@ const HeroSection = () => {
           backgroundPosition: 'center',
         }}
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-background/5 via-background/0 to-background/6" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/10 via-background/0 to-background/10" />
       </div>
       
       <div className="container relative z-10 text-center px-4 py-20">

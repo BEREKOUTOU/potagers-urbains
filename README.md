@@ -16,7 +16,7 @@ An urban gardening platform that connects city dwellers with local gardens, fost
 
 - **Frontend**: React 18 with TypeScript
 - **Build Tool**: Vite
-- **Styling**: Tailwind CSS with shadcn/ui components
+- **Styling**: Tailwind CSS with shading/ui components
 - **Routing**: React Router DOM
 - **State Management**: TanStack Query (React Query)
 - **Form Handling**: React Hook Form with Zod validation

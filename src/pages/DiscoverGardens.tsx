@@ -20,6 +20,7 @@ const DiscoverGardens = (): JSX.Element => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedLocation, setSelectedLocation] = useState<string>("");
+  const [selectedRegion, setSelectedRegion] = useState<string>("");
   const [memberRange, setMemberRange] = useState<number[]>([1, 20]);
   const [selectedCrops, setSelectedCrops] = useState<string[]>([]);
   const [availableOnly, setAvailableOnly] = useState<boolean>(false);
@@ -34,6 +35,13 @@ const DiscoverGardens = (): JSX.Element => {
           !garden.name.toLowerCase().includes(query) &&
           !garden.location.toLowerCase().includes(query)
         ) {
+          return false;
+        }
+      }
+
+      // Region filter
+      if (selectedRegion && selectedRegion !== "toutes") {
+        if (garden.region !== selectedRegion) {
           return false;
         }
       }
@@ -74,7 +82,7 @@ const DiscoverGardens = (): JSX.Element => {
 
       return true;
     });
-  }, [searchQuery, selectedLocation, memberRange, selectedCrops, availableOnly]);
+  }, [searchQuery, selectedRegion, selectedLocation, memberRange, selectedCrops, availableOnly]);
 
   const recommendedGardens: Garden[] = gardens.slice(0, 3);
 
@@ -88,6 +96,8 @@ const DiscoverGardens = (): JSX.Element => {
     { id: "fruits", label: "Fruits", icon: Apple },
     { id: "fleurs", label: "Fleurs", icon: Flower }
   ] as const;
+
+  const regions = Array.from(new Set(gardens.map(g => g.region))).sort();
 
   const handleCropToggle = (cropId: string): void => {
     setSelectedCrops(prev =>
@@ -215,6 +225,24 @@ const DiscoverGardens = (): JSX.Element => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              {/* Region */}
+              <div className="space-y-2">
+                <Label>Région</Label>
+                <Select value={selectedRegion} onValueChange={setSelectedRegion}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Toutes les régions" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="toutes">Toutes les régions</SelectItem>
+                    {regions.map((region) => (
+                      <SelectItem key={region} value={region}>
+                        {region}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
               {/* Location */}
               <div className="space-y-2">
                 <Label>Localisation</Label>
