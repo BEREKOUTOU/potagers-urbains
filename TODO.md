@@ -1,4 +1,0 @@
-- [x] Update src/data/gardens.ts to include gardens from all 18 French administrative regions
-- [x] Modify src/pages/DiscoverGardens.tsx to add region filter dropdown in the filters section
-- [x] Update the filtering logic in DiscoverGardens.tsx to include region selection
-- [x] Test the new region filter functionality
