@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import {
   Brain,
   Stethoscope,
@@ -21,7 +22,9 @@ import {
   AlertTriangle,
   Thermometer,
   Droplets,
-  Sun
+  Sun,
+  X,
+  Loader2
 } from "lucide-react";
 
 // Mock data for AI features
@@ -95,6 +98,16 @@ const iotData = {
 const AIFeatures = () => {
   const [chatMessage, setChatMessage] = useState("");
   const [chatHistory, setChatHistory] = useState(mockChat);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [diagnosticResult, setDiagnosticResult] = useState<{
+    problem: string;
+    confidence: number;
+    solution: string;
+    severity: 'low' | 'medium' | 'high';
+  } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSendMessage = () => {
     if (chatMessage.trim()) {
@@ -107,6 +120,88 @@ const AIFeatures = () => {
         }]);
       }, 1000);
       setChatMessage("");
+    }
+  };
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      processFile(file);
+    }
+  };
+
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    const file = event.dataTransfer.files?.[0];
+    if (file) {
+      processFile(file);
+    }
+  };
+
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+  };
+
+  const processFile = (file: File) => {
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Veuillez sélectionner un fichier image valide.');
+      return;
+    }
+
+    // Validate file size (10MB max)
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Le fichier est trop volumineux. Taille maximale: 10MB.');
+      return;
+    }
+
+    setSelectedFile(file);
+    const url = URL.createObjectURL(file);
+    setPreviewUrl(url);
+    setDiagnosticResult(null);
+    setIsAnalyzing(true);
+
+    // Simulate AI analysis
+    setTimeout(() => {
+      const mockResults = [
+        {
+          problem: "Mildiou détecté",
+          confidence: 92,
+          solution: "Appliquez un traitement à base de soufre et améliorez la ventilation autour de la plante. Évitez l'arrosage par aspersion.",
+          severity: 'high' as const
+        },
+        {
+          problem: "Carence en azote",
+          confidence: 87,
+          solution: "Utilisez un engrais riche en azote ou ajoutez du compost organique. Les feuilles jaunissent généralement par manque d'azote.",
+          severity: 'medium' as const
+        },
+        {
+          problem: "Pucerons présents",
+          confidence: 95,
+          solution: "Traitez avec un savon insecticide ou utilisez des huiles essentielles. Les pucerons sont visibles à l'œil nu sur les jeunes pousses.",
+          severity: 'medium' as const
+        },
+        {
+          problem: "Plante en bonne santé",
+          confidence: 88,
+          solution: "Continuez vos bonnes pratiques ! Votre plante semble en excellente forme.",
+          severity: 'low' as const
+        }
+      ];
+
+      const randomResult = mockResults[Math.floor(Math.random() * mockResults.length)];
+      setDiagnosticResult(randomResult);
+      setIsAnalyzing(false);
+    }, 3000);
+  };
+
+  const removeFile = () => {
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    setDiagnosticResult(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
@@ -178,19 +273,110 @@ const AIFeatures = () => {
         </div>
 
         <div className="max-w-2xl mx-auto">
-          <Card className="border-dashed border-2 border-primary/30 hover:border-primary/50 transition-colors">
-            <CardContent className="p-8 text-center">
-              <Upload className="h-12 w-12 text-primary mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Glissez-déposez votre image ici</h3>
-              <p className="text-muted-foreground mb-4">
-                Formats acceptés: JPG, PNG, WEBP (max 10MB)
-              </p>
-              <Button variant="outline">
-                <Upload className="h-4 w-4 mr-2" />
-                Sélectionner un fichier
-              </Button>
-            </CardContent>
-          </Card>
+          {!selectedFile ? (
+            <Card
+              className="border-dashed border-2 border-primary/30 hover:border-primary/50 transition-colors cursor-pointer"
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <CardContent className="p-8 text-center">
+                <Upload className="h-12 w-12 text-primary mx-auto mb-4" />
+                <h3 className="text-xl font-semibold mb-2">Glissez-déposez votre image ici</h3>
+                <p className="text-muted-foreground mb-4">
+                  Formats acceptés: JPG, PNG, WEBP (max 10MB)
+                </p>
+                <Button variant="outline" onClick={(e) => {
+                  e.stopPropagation();
+                  fileInputRef.current?.click();
+                }}>
+                  <Upload className="h-4 w-4 mr-2" />
+                  Sélectionner un fichier
+                </Button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
+              </CardContent>
+            </Card>
+          ) : (
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
+                  <div className="relative">
+                    <img
+                      src={previewUrl!}
+                      alt="Plant preview"
+                      className="w-32 h-32 object-cover rounded-lg"
+                    />
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      className="absolute -top-2 -right-2 h-6 w-6 p-0"
+                      onClick={removeFile}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold mb-2">{selectedFile.name}</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                    </p>
+
+                    {isAnalyzing ? (
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <span className="text-sm">Analyse en cours...</span>
+                        </div>
+                        <Progress value={66} className="w-full" />
+                        <p className="text-xs text-muted-foreground">
+                          GreenBot examine votre plante avec précision
+                        </p>
+                      </div>
+                    ) : diagnosticResult ? (
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2">
+                          <Badge
+                            variant={
+                              diagnosticResult.severity === 'high' ? 'destructive' :
+                              diagnosticResult.severity === 'medium' ? 'secondary' : 'default'
+                            }
+                          >
+                            {diagnosticResult.problem}
+                          </Badge>
+                          <Badge variant="outline">
+                            {diagnosticResult.confidence}% confiance
+                          </Badge>
+                        </div>
+                        <p className="text-sm">{diagnosticResult.solution}</p>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setSelectedFile(null);
+                            setPreviewUrl(null);
+                            setDiagnosticResult(null);
+                          }}
+                        >
+                          Analyser une autre photo
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button onClick={() => processFile(selectedFile)}>
+                        <Stethoscope className="h-4 w-4 mr-2" />
+                        Lancer le diagnostic
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </section>
 
@@ -369,7 +555,9 @@ const AIFeatures = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="bg-primary hover:bg-primary/90">
+            <Link to="/signup" className="w-full">
               Commencer avec GreenBot
+            </Link>
             </Button>
             <Button size="lg" variant="outline">
               Télécharger l'App Mobile
