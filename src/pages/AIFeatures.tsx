@@ -24,7 +24,8 @@ import {
   Droplets,
   Sun,
   X,
-  Loader2
+  Loader2,
+  Mic
 } from "lucide-react";
 
 // Mock data for AI features
@@ -307,11 +308,13 @@ const AIFeatures = () => {
               <CardContent className="p-6">
                 <div className="flex items-start gap-4">
                   <div className="relative">
-                    <img
-                      src={previewUrl!}
-                      alt="Plant preview"
-                      className="w-32 h-32 object-cover rounded-lg"
-                    />
+                    {previewUrl && (
+                      <img
+                        src={previewUrl}
+                        alt="Plant preview"
+                        className="w-32 h-32 object-cover rounded-lg"
+                      />
+                    )}
                     <Button
                       size="sm"
                       variant="destructive"
@@ -420,6 +423,7 @@ const AIFeatures = () => {
                   onChange={(e) => setChatMessage(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                 />
+                <Mic className="h-6 w-6 text-muted-foreground cursor-pointer hover:text-foreground mt-2" />
                 <Button onClick={handleSendMessage}>
                   <Send className="h-4 w-4" />
                 </Button>
