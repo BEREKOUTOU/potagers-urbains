@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -27,6 +27,33 @@ import {
   Loader2,
   Mic
 } from "lucide-react";
+
+// Type declarations for Web Speech API
+interface SpeechRecognitionEvent extends Event {
+  results: SpeechRecognitionResultList;
+}
+
+interface SpeechRecognitionErrorEvent extends Event {
+  error: string;
+}
+
+interface SpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onresult: (event: SpeechRecognitionEvent) => void;
+  onend: () => void;
+  onerror: (event: SpeechRecognitionErrorEvent) => void;
+  start(): void;
+  stop(): void;
+}
+
+declare global {
+  interface Window {
+    SpeechRecognition: new () => SpeechRecognition;
+    webkitSpeechRecognition: new () => SpeechRecognition;
+  }
+}
 
 // Mock data for AI features
 const aiFeatures = [
@@ -108,6 +135,8 @@ const AIFeatures = () => {
     solution: string;
     severity: 'low' | 'medium' | 'high';
   } | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [recognition, setRecognition] = useState<SpeechRecognition | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSendMessage = () => {
@@ -203,6 +232,77 @@ const AIFeatures = () => {
     setDiagnosticResult(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
+    }
+  };
+
+  // Initialize speech recognition
+  useEffect(() => {
+    const checkSpeechRecognitionSupport = () => {
+      // Check for different browser implementations
+      const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+      if (SpeechRecognitionAPI) {
+        try {
+          const recognitionInstance = new SpeechRecognitionAPI();
+          recognitionInstance.continuous = false;
+          recognitionInstance.interimResults = false;
+          recognitionInstance.lang = 'fr-FR'; // French language
+
+          recognitionInstance.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            setChatMessage(transcript);
+            setIsRecording(false);
+          };
+
+          recognitionInstance.onend = () => {
+            setIsRecording(false);
+          };
+
+          recognitionInstance.onerror = (event) => {
+            console.error('Speech recognition error:', event.error);
+            setIsRecording(false);
+            let errorMessage = 'Erreur de reconnaissance vocale.';
+            switch (event.error) {
+              case 'not-allowed':
+                errorMessage += ' Permission du microphone refusée. Veuillez autoriser l\'accès au microphone.';
+                break;
+              case 'no-speech':
+                errorMessage += ' Aucun discours détecté. Essayez de parler plus fort.';
+                break;
+              case 'network':
+                errorMessage += ' Erreur réseau. Vérifiez votre connexion internet.';
+                break;
+              default:
+                errorMessage += ' Vérifiez les permissions du microphone.';
+            }
+            alert(errorMessage);
+          };
+
+          setRecognition(recognitionInstance);
+        } catch (error) {
+          console.error('Failed to initialize speech recognition:', error);
+          setRecognition(null);
+        }
+      } else {
+        console.warn('Speech Recognition API not supported in this browser');
+        setRecognition(null);
+      }
+    };
+
+    checkSpeechRecognitionSupport();
+  }, []);
+
+  const handleMicClick = () => {
+    if (!recognition) {
+      alert('La reconnaissance vocale n\'est pas supportée par votre navigateur.');
+      return;
+    }
+
+    if (isRecording) {
+      recognition.stop();
+    } else {
+      recognition.start();
+      setIsRecording(true);
     }
   };
 
@@ -423,7 +523,14 @@ const AIFeatures = () => {
                   onChange={(e) => setChatMessage(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                 />
-                <Mic className="h-6 w-6 text-muted-foreground cursor-pointer hover:text-foreground mt-2" />
+                <Mic
+                  className={`h-6 w-6 cursor-pointer mt-2 transition-colors ${
+                    isRecording
+                      ? 'text-red-500 animate-pulse'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                  onClick={handleMicClick}
+                />
                 <Button onClick={handleSendMessage}>
                   <Send className="h-4 w-4" />
                 </Button>

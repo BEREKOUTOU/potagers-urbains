@@ -9,6 +9,9 @@ import { Plus, Sprout, ListTodo, CalendarCheck, AlertTriangle, MapPin, Thermomet
 import garden1 from "@/assets/garden-1.jpg";
 import garden2 from "@/assets/garden-2.jpg";
 import garden3 from "@/assets/garden-3.jpg";
+import garden4 from "@/assets/garden-4.jpg";
+import garden5 from "@/assets/garden-05.jpg";
+import garden6 from "@/assets/garden-66.jpg";
 
 const myGardens = [
   {
@@ -69,6 +72,66 @@ const myGardens = [
     harvests: [
       { crop: "Poivrons", date: "Dans 10 jours" },
       { crop: "Menthe", date: "Prêt" }
+    ]
+  },
+  {
+    id: 4,
+    name: "Jardin des Lilas",
+    location: "Paris 1ère",
+    image: garden4,
+    status: "active",
+    iot: {
+      temperature: 24,
+      humidity: 68,
+      ph: 6.5
+    },
+    tasks: [
+      { title: "Arrosage tomates", time: "Aujourd'hui 18h" },
+      { title: "Tailler basilic", time: "Demain" }
+    ],
+    harvests: [
+      { crop: "Tomates cerises", date: "Dans 5 jours" },
+      { crop: "Basilic", date: "Prêt" }
+    ]
+  },
+  {
+    id: 5,
+    name: "Un potager en toiture : un défi à relever",
+    location: "Paris 1ère",
+    image: garden5,
+    status: "active",
+    iot: {
+      temperature: 24,
+      humidity: 68,
+      ph: 6.5
+    },
+    tasks: [
+      { title: "Arrosage tomates", time: "Aujourd'hui 18h" },
+      { title: "Tailler basilic", time: "Demain" }
+    ],
+    harvests: [
+      { crop: "Tomates cerises", date: "Dans 5 jours" },
+      { crop: "Basilic", date: "Prêt" }
+    ]
+  },
+  {
+    id: 6,
+    name: "Atelier de Rempotage",
+    location: "paris 1ère",
+    image: garden6,
+    status: "active",
+    iot: {
+      temperature: 24,
+      humidity: 68,
+      ph: 6.5
+    },
+    tasks: [
+      { title: "Arrosage tomates", time: "Aujourd'hui 18h" },
+      { title: "Tailler basilic", time: "Demain" }
+    ],
+    harvests: [
+      { crop: "Tomates cerises", date: "Dans 5 jours" },
+      { crop: "Basilic", date: "Prêt" }
     ]
   }
 ];

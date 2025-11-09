@@ -378,5 +378,19 @@ export const gardens: readonly Garden[] = [
     rating: 4.9,
     image: garden6,
     description: "Jardin volcanique réunionnais."
+  },
+  // Île-de-France
+  {
+    id: 27,
+    name: "Jardin des Batignolles",
+    location: "Paris 17ème",
+    region: "Île-de-France",
+    members: 24,
+    maxMembers: 30,
+    crops: ["Légumes", "Herbes aromatiques", "Fleurs"],
+    features: ["Jardin partagé", "Actif", "Communautaire"],
+    rating: 4.8,
+    image: garden1,
+    description: "Jardin communautaire urbain en plein cœur des Batignolles, dédié au jardinage partagé et à la biodiversité. Espace vert partagé où les habitants cultivent ensemble légumes, herbes et fleurs dans un esprit de convivialité et de respect de l'environnement."
   }
 ] as const;

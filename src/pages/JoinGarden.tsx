@@ -8,7 +8,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Users, Star, ArrowLeft, Download, CheckCircle } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { MapPin, Users, Star, ArrowLeft, Download, CheckCircle, Calendar, Clock, User, Camera, FileText, Heart, Share2 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { gardens } from "@/data/gardens";
@@ -33,6 +37,37 @@ const JoinGarden = (): JSX.Element => {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [activeTab, setActiveTab] = useState("apercu");
+
+  // Mock data for garden sections
+  const gardenPhotos = [
+    garden.image,
+    "/src/assets/garden-02.jpg",
+    "/src/assets/garden-03.jpg",
+    "/src/assets/garden-04.jpg",
+    "/src/assets/garden-05.jpg"
+  ];
+
+  const gardenMembers = [
+    { name: "Marie Dupont", role: "Coordinateur", avatar: "/src/assets/photo-profil.jpg" },
+    { name: "Jean Martin", role: "Membre actif", avatar: "/src/assets/photo-profil.jpg" },
+    { name: "Sophie Leroy", role: "Membre actif", avatar: "/src/assets/photo-profil.jpg" },
+    { name: "Pierre Durand", role: "Nouveau membre", avatar: "/src/assets/photo-profil.jpg" },
+    { name: "Anne Moreau", role: "Membre actif", avatar: "/src/assets/photo-profil.jpg" },
+    { name: "Luc Bernard", role: "Coordinateur", avatar: "/src/assets/photo-profil.jpg" },
+  ];
+
+  const gardenActivities = [
+    { title: "Atelier compostage", date: "15 mars 2024", time: "14h-16h", description: "Apprendre à faire son compost" },
+    { title: "Semis de printemps", date: "22 mars 2024", time: "10h-12h", description: "Préparation des semis saisonniers" },
+    { title: "Réunion mensuelle", date: "30 mars 2024", time: "19h-21h", description: "Point sur les activités du mois" },
+  ];
+
+  const coordinators = [
+    { name: "Marie Dupont", role: "Coordinateur principal", avatar: "/src/assets/photo-profil.jpg" },
+    { name: "Luc Bernard", role: "Coordinateur adjoint", avatar: "/src/assets/photo-profil.jpg" },
+  ];
 
   if (!garden) {
     return (
@@ -82,6 +117,7 @@ const JoinGarden = (): JSX.Element => {
     if (validateForm()) {
       // Handle form submission
       console.log("Form submitted:", formData);
+      setIsSubmitted(true);
       // Navigate to success page or show success message
     }
   };
@@ -171,13 +207,337 @@ En cas de non-respect répété, l'accès au jardin pourra être suspendu.
         </div>
       </section>
 
-      {/* Application Form */}
+      {/* Tabs Section */}
       <section className="py-16">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold text-center mb-8">Demande d'adhésion</h2>
+          <div className="max-w-6xl mx-auto">
+            <Tabs defaultValue="apercu" className="w-full">
+              <TabsList className="grid w-full grid-cols-6 mb-8">
+                <TabsTrigger value="apercu">Aperçu</TabsTrigger>
+                <TabsTrigger value="photos">Photos</TabsTrigger>
+                <TabsTrigger value="membres">Membres</TabsTrigger>
+                <TabsTrigger value="activites">Activités</TabsTrigger>
+                <TabsTrigger value="regles">Règles</TabsTrigger>
+                <TabsTrigger value="rejoindre">Rejoindre</TabsTrigger>
+              </TabsList>
 
-            <form onSubmit={handleSubmit} className="space-y-8">
+              {/* Aperçu Tab */}
+              <TabsContent value="apercu" className="space-y-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  {/* Left Column */}
+                  <div className="space-y-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <FileText className="h-5 w-5" />
+                          Description
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-muted-foreground">{garden.description}</p>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Calendar className="h-5 w-5" />
+                          Activités récentes
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        {gardenActivities.slice(0, 2).map((activity, index) => (
+                          <div key={index} className="flex items-start gap-3">
+                            <div className="bg-green-100 p-2 rounded-lg">
+                              <Calendar className="h-4 w-4 text-green-600" />
+                            </div>
+                            <div>
+                              <h4 className="font-semibold">{activity.title}</h4>
+                              <p className="text-sm text-muted-foreground">{activity.date} - {activity.time}</p>
+                              <p className="text-sm">{activity.description}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Camera className="h-5 w-5" />
+                          Photos du jardin
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <Carousel className="w-full">
+                          <CarouselContent>
+                            {gardenPhotos.map((photo, index) => (
+                              <CarouselItem key={index}>
+                                <img
+                                  src={photo}
+                                  alt={`Photo ${index + 1}`}
+                                  className="w-full h-48 object-cover rounded-lg"
+                                />
+                              </CarouselItem>
+                            ))}
+                          </CarouselContent>
+                          <CarouselPrevious />
+                          <CarouselNext />
+                        </Carousel>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <FileText className="h-5 w-5" />
+                          Règles principales
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <ul className="space-y-2 text-sm">
+                          <li className="flex items-start gap-2">
+                            <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                            Respect des horaires d'ouverture et de fermeture
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                            Participation aux tâches collectives
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                            Utilisation responsable des outils
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <CheckCircle className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                            Respect de l'environnement
+                          </li>
+                        </ul>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Right Column */}
+                  <div className="space-y-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Informations pratiques</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="flex items-center gap-2">
+                          <MapPin className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm">{garden.location}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Users className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm">{garden.members}/{garden.maxMembers} membres</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Star className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm">Note: {garden.rating}/5</span>
+                        </div>
+                        <div className="flex flex-wrap gap-1 mt-4">
+                          {garden.crops.map((crop) => (
+                            <Badge key={crop} variant="secondary" className="text-xs">
+                              {crop}
+                            </Badge>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <User className="h-5 w-5" />
+                          Coordinateurs
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        {coordinators.map((coordinator, index) => (
+                          <div key={index} className="flex items-center gap-3">
+                            <Avatar>
+                              <AvatarImage src={coordinator.avatar} />
+                              <AvatarFallback>{coordinator.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="font-semibold">{coordinator.name}</p>
+                              <p className="text-sm text-muted-foreground">{coordinator.role}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Rejoignez-nous !</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          Intéressé par ce jardin communautaire ? Remplissez le formulaire d'adhésion pour devenir membre.
+                        </p>
+                        <Button className="w-full" onClick={() => setActiveTab("rejoindre")}>
+                          <Heart className="h-4 w-4 mr-2" />
+                          Rejoindre ce jardin
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+              </TabsContent>
+
+              {/* Photos Tab */}
+              <TabsContent value="photos" className="space-y-8">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Camera className="h-5 w-5" />
+                      Galerie photos du jardin
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {gardenPhotos.map((photo, index) => (
+                        <div key={index} className="relative group">
+                          <img
+                            src={photo}
+                            alt={`Photo ${index + 1}`}
+                            className="w-full h-48 object-cover rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+                          />
+                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all rounded-lg flex items-center justify-center">
+                            <Button variant="secondary" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Camera className="h-4 w-4 mr-2" />
+                              Voir
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Membres Tab */}
+              <TabsContent value="membres" className="space-y-8">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Users className="h-5 w-5" />
+                      Membres du jardin ({garden.members})
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {gardenMembers.map((member, index) => (
+                        <div key={index} className="flex items-center gap-3 p-4 border rounded-lg">
+                          <Avatar className="h-12 w-12">
+                            <AvatarImage src={member.avatar} />
+                            <AvatarFallback>{member.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-semibold">{member.name}</p>
+                            <p className="text-sm text-muted-foreground">{member.role}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Activités Tab */}
+              <TabsContent value="activites" className="space-y-8">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Calendar className="h-5 w-5" />
+                      Activités à venir
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {gardenActivities.map((activity, index) => (
+                      <div key={index} className="flex items-start gap-4 p-4 border rounded-lg">
+                        <div className="bg-green-100 p-3 rounded-lg">
+                          <Calendar className="h-6 w-6 text-green-600" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-lg">{activity.title}</h3>
+                          <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <Calendar className="h-4 w-4" />
+                              {activity.date}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Clock className="h-4 w-4" />
+                              {activity.time}
+                            </span>
+                          </div>
+                          <p className="mt-2 text-sm">{activity.description}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Règles Tab */}
+              <TabsContent value="regles" className="space-y-8">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <FileText className="h-5 w-5" />
+                      Règlement intérieur
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="bg-muted p-6 rounded-lg">
+                      <pre className="whitespace-pre-wrap text-sm">{gardenRules}</pre>
+                    </div>
+                    <div className="flex justify-end mt-4">
+                      <Button variant="outline">
+                        <Download className="h-4 w-4 mr-2" />
+                        Télécharger le règlement
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* Rejoindre Tab */}
+              <TabsContent value="rejoindre" className="space-y-8">
+                <div className="max-w-4xl mx-auto">
+                  <h2 className="text-3xl font-bold text-center mb-8">Demande d'adhésion</h2>
+
+                  {isSubmitted ? (
+                    <Dialog open={isSubmitted} onOpenChange={setIsSubmitted}>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle className="flex items-center gap-2">
+                            <CheckCircle className="h-6 w-6 text-green-600" />
+                            Candidature envoyée !
+                          </DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <p className="text-center">
+                            Votre demande d'adhésion a été envoyée avec succès. Les coordinateurs du jardin examineront votre candidature.
+                          </p>
+                          <p className="text-sm text-muted-foreground text-center">
+                            Vous recevrez une réponse par email dans les 7 jours ouvrés.
+                          </p>
+                          <div className="flex justify-center gap-4">
+                            <Button onClick={() => navigate("/decouvrir-jardins")}>
+                              Retour aux jardins
+                            </Button>
+                            <Button variant="outline" onClick={() => setIsSubmitted(false)}>
+                              Fermer
+                            </Button>
+                          </div>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  ) : (
+                    <form onSubmit={handleSubmit} className="space-y-8">
               {/* Personal Information */}
               <Card>
                 <CardHeader>
@@ -396,7 +756,11 @@ En cas de non-respect répété, l'accès au jardin pourra être suspendu.
                   </div>
                 </CardContent>
               </Card>
-            </form>
+                    </form>
+                  )}
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
       </section>
