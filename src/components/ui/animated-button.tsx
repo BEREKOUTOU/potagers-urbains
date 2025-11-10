@@ -161,7 +161,7 @@ const AnimatedButton = React.forwardRef<HTMLButtonElement, AnimatedButtonProps>(
         ref={ref}
         {...props}
       >
-        <style jsx>{buttonStyle}</style>
+        <style dangerouslySetInnerHTML={{ __html: buttonStyle }} />
         {!hideAnimations && (
           <div className="absolute inset-0 overflow-visible -z-30 blur-[2px] [container-type:size]">
             <div className="absolute inset-0 h-[100cqh] animate-shimmer-slide-scoped [aspect-ratio:1]">
