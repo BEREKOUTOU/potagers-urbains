@@ -3,6 +3,8 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
 import { pool } from './config/database.ts';
 import authRoutes from './routes/auth.ts';
 import userRoutes from './routes/users.ts';
@@ -15,6 +17,41 @@ import statRoutes from './routes/stats.ts';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// Swagger configuration
+const swaggerOptions = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Green City Grow Hub API',
+      version: '1.0.0',
+      description: 'API for Green City Grow Hub - Urban Gardening Platform',
+    },
+    servers: [
+      {
+        url: `http://localhost:${PORT}`,
+        description: 'Development server',
+      },
+    ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+    },
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
+  },
+  apis: ['./src/routes/*.ts'], // Path to the API routes
+};
+
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
 // Security middleware
 // app.use(helmet());
@@ -43,6 +80,9 @@ app.use(morgan('combined'));
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Swagger documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Routes
 app.use('/api/auth', authRoutes);
