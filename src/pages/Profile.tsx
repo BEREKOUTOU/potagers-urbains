@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,35 +13,54 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Sprout, User, Mail, Phone, MapPin, Calendar, Edit, Settings, Shield, Trash2, Download, ExternalLink, Heart, BookOpen, Video, FileText, Plus, Activity, Users, Star, Camera } from "lucide-react";
+import { Sprout, User, Mail, Phone, MapPin, Calendar, Edit, Settings, Shield, Trash2, Download, ExternalLink, Heart, BookOpen, Video, FileText, Plus, Activity, Users, Star, Camera, Loader2 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 const Profile = () => {
+  const { user, updateProfile } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [profileImage, setProfileImage] = useState("/photo-profil.jpg");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [userInfo, setUserInfo] = useState({
-    firstName: "Jean",
-    lastName: "Dupont",
-    email: "jean.dupont@email.com",
+    firstName: user?.first_name || "Jean",
+    lastName: user?.last_name || "Dupont",
+    email: user?.email || "jean.dupont@email.com",
     phone: "+33 6 12 34 56 78",
     address: "123 Rue des Jardins, 75001 Paris",
-    bio: "Passionné de jardinage urbain et de permaculture. J'adore partager mes connaissances sur les jardins connectés."
+    bio: user?.bio || "Passionné de jardinage urbain et de permaculture. J'adore partager mes connaissances sur les jardins connectés."
   });
 
   const [preferences, setPreferences] = useState({
     emailNotifications: true,
     pushNotifications: false,
     weeklySummary: true,
-    region: "Île-de-France",
+    region: user?.region || "Île-de-France",
     language: "Français",
     timezone: "Europe/Paris"
   });
 
-  const handleSave = () => {
-    setIsEditing(false);
-    // Here you would typically save to backend
+  const handleSave = async () => {
+    setIsLoading(true);
+    try {
+      await updateProfile({
+        first_name: userInfo.firstName,
+        last_name: userInfo.lastName,
+        bio: userInfo.bio,
+        location: userInfo.address, // Assuming address maps to location
+        region: preferences.region,
+      });
+      toast.success("Profil mis à jour avec succès");
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour du profil:", error);
+      toast.error("Erreur lors de la mise à jour du profil");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCancel = () => {
@@ -95,7 +114,7 @@ const Profile = () => {
             <div className="text-center md:text-left">
               <h1 className="text-4xl font-bold mb-2">{userInfo.firstName} {userInfo.lastName}</h1>
               <p className="text-xl mb-2">{userInfo.email}</p>
-              <p className="text-lg opacity-90">Membre depuis le 15 mars 2023</p>
+              <p className="text-lg opacity-90">Membre depuis {user?.join_date ? new Date(user.join_date).toLocaleDateString('fr-FR') : '15 mars 2023'}</p>
             </div>
           </div>
         </div>
@@ -236,8 +255,17 @@ const Profile = () => {
                       </Button>
                     ) : (
                       <>
-                        <Button onClick={handleSave}>Sauvegarder</Button>
-                        <Button variant="outline" onClick={handleCancel}>Annuler</Button>
+                        <Button onClick={handleSave} disabled={isLoading}>
+                          {isLoading ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              Sauvegarde...
+                            </>
+                          ) : (
+                            "Sauvegarder"
+                          )}
+                        </Button>
+                        <Button variant="outline" onClick={handleCancel} disabled={isLoading}>Annuler</Button>
                       </>
                     )}
                   </div>

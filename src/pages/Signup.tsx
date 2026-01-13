@@ -6,21 +6,30 @@ import { Checkbox } from "@/components/ui/checkbox";
 import BackToTop from "@/components/BackToTop";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Sprout, User, Mail, Lock, MapPin, Eye, EyeOff } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Sprout, User, Mail, Lock, MapPin, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
+    username: "",
     firstName: "",
     lastName: "",
     email: "",
     password: "",
     confirmPassword: "",
     location: "",
+    region: "",
+    bio: "",
     acceptTerms: false
   });
+
+  const { register } = useAuth();
+  const navigate = useNavigate();
 
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({
@@ -29,10 +38,46 @@ const Signup = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle signup logic here
-    console.log("Signup data:", formData);
+
+    // Validation
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Les mots de passe ne correspondent pas");
+      return;
+    }
+
+    if (!formData.acceptTerms) {
+      toast.error("Vous devez accepter les conditions d'utilisation");
+      return;
+    }
+
+    if (!formData.username) {
+      toast.error("Le nom d'utilisateur est requis");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      await register({
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        location: formData.location,
+        region: formData.region,
+        bio: formData.bio,
+      });
+
+      toast.success("Compte créé avec succès !");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Erreur lors de l'inscription";
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -117,6 +162,23 @@ const Signup = () => {
                       className="pl-10"
                       value={formData.email}
                       onChange={(e) => handleInputChange("email", e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Username */}
+                <div className="space-y-2">
+                  <Label htmlFor="username">Nom d'utilisateur</Label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="username"
+                      type="text"
+                      placeholder="Votre nom d'utilisateur"
+                      className="pl-10"
+                      value={formData.username}
+                      onChange={(e) => handleInputChange("username", e.target.value)}
                       required
                     />
                   </div>
@@ -215,8 +277,15 @@ const Signup = () => {
                 </div>
 
                 {/* Submit Button */}
-                <Button type="submit" className="w-full" size="lg">
-                  S'inscrire
+                <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Inscription en cours...
+                    </>
+                  ) : (
+                    "S'inscrire"
+                  )}
                 </Button>
               </form>
 
@@ -296,3 +365,11 @@ const Signup = () => {
 };
 
 export default Signup;
+
+/* Database Configuration
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=green_city_grow_hub
+DB_USER=postgres        # your postgres username
+DB_PASSWORD=your_actual_password  # your postgres password
+*/
