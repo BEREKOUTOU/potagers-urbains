@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { pool } from '../config/database.ts';
 import { authenticateToken } from '../middleware/auth.ts';
+import { validate, registerSchema, loginSchema, updateProfileSchema } from '../middleware/validation.ts';
 
 type AuthRequest = express.Request & {
   user?: {
@@ -15,7 +16,7 @@ type AuthRequest = express.Request & {
 const router = express.Router();
 
 // Register new user
-router.post('/register', async (req, res): Promise<void> => {
+router.post('/register', validate(registerSchema), async (req, res): Promise<void> => {
   try {
     const { username, email, password, firstName, lastName, location, region, bio } = req.body;
 
@@ -63,7 +64,7 @@ router.post('/register', async (req, res): Promise<void> => {
 });
 
 // Login user
-router.post('/login', async (req, res): Promise<void> => {
+router.post('/login', validate(loginSchema), async (req, res): Promise<void> => {
   try {
     const { email, password } = req.body;
     console.log('Login attempt for:', email);
@@ -137,7 +138,7 @@ router.get('/profile', authenticateToken, async (req, res): Promise<void> => {
     const userId = authReq.user.id;
 
     const result = await pool.query(
-      `SELECT id, username, email, first_name, last_name, profile_picture_url, bio, location, region, join_date, last_login, role
+      `SELECT id, username, email, first_name, last_name, profile_picture_url, bio, location, region, phone, join_date, last_login, role
        FROM users WHERE id = $1`,
       [userId]
     );
@@ -155,7 +156,7 @@ router.get('/profile', authenticateToken, async (req, res): Promise<void> => {
 });
 
 // Update user profile
-router.put('/profile', authenticateToken, async (req, res): Promise<void> => {
+router.put('/profile', authenticateToken, validate(updateProfileSchema), async (req, res): Promise<void> => {
   try {
     const authReq = req as AuthRequest;
     if (!authReq.user) {
@@ -194,6 +195,10 @@ router.put('/profile', authenticateToken, async (req, res): Promise<void> => {
       updates.push(`profile_picture_url = $${paramIndex++}`);
       values.push(profilePictureUrl);
     }
+    if (phone !== undefined) {
+      updates.push(`phone = $${paramIndex++}`);
+      values.push(phone);
+    }
 
     if (updates.length === 0) {
       res.status(400).json({ error: 'No fields to update' });
@@ -206,7 +211,7 @@ router.put('/profile', authenticateToken, async (req, res): Promise<void> => {
       `UPDATE users
        SET ${updates.join(', ')}
        WHERE id = $${paramIndex}
-       RETURNING id, username, email, first_name, last_name, profile_picture_url, bio, location, region`,
+       RETURNING id, username, email, first_name, last_name, profile_picture_url, bio, location, region, phone`,
       values
     );
 
@@ -226,6 +231,3 @@ router.put('/profile', authenticateToken, async (req, res): Promise<void> => {
 });
 
 export default router;
-
-
-

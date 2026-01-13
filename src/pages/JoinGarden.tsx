@@ -17,6 +17,10 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { gardens } from "@/data/gardens";
 import BackToTop from "@/components/BackToTop";
+import garden2 from '../assets/garden-02.jpg';
+import garden3 from '../assets/garden-03.jpg';
+import garden4 from '../assets/garden-04.jpg';
+import garden5 from '../assets/garden-05.jpg';
 
 const JoinGarden = (): JSX.Element => {
   const { id } = useParams<{ id: string }>();
@@ -43,19 +47,19 @@ const JoinGarden = (): JSX.Element => {
   // Mock data for garden sections
   const gardenPhotos = [
     garden.image,
-    "/src/assets/garden-02.jpg",
-    "/src/assets/garden-03.jpg",
-    "/src/assets/garden-04.jpg",
-    "/src/assets/garden-05.jpg"
+    garden2,
+    garden3,
+    garden4,
+    garden5
   ];
 
   const gardenMembers = [
-    { name: "Marie Dupont", role: "Coordinateur", avatar: "/src/assets/photo-profil.jpg" },
-    { name: "Jean Martin", role: "Membre actif", avatar: "/src/assets/photo-profil.jpg" },
-    { name: "Sophie Leroy", role: "Membre actif", avatar: "/src/assets/photo-profil.jpg" },
-    { name: "Pierre Durand", role: "Nouveau membre", avatar: "/src/assets/photo-profil.jpg" },
-    { name: "Anne Moreau", role: "Membre actif", avatar: "/src/assets/photo-profil.jpg" },
-    { name: "Luc Bernard", role: "Coordinateur", avatar: "/src/assets/photo-profil.jpg" },
+    { name: "Marie Dupont", role: "Coordinateur" },
+    { name: "Jean Martin", role: "Membre actif" },
+    { name: "Sophie Leroy", role: "Membre actif" },
+    { name: "Pierre Durand", role: "Nouveau membre" },
+    { name: "Anne Moreau", role: "Membre actif" },
+    { name: "Luc Bernard", role: "Coordinateur" },
   ];
 
   const gardenActivities = [
@@ -65,8 +69,8 @@ const JoinGarden = (): JSX.Element => {
   ];
 
   const coordinators = [
-    { name: "Marie Dupont", role: "Coordinateur principal", avatar: "/src/assets/photo-profil.jpg" },
-    { name: "Luc Bernard", role: "Coordinateur adjoint", avatar: "/src/assets/photo-profil.jpg" },
+    { name: "Marie Dupont", role: "Coordinateur principal", avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150" },
+    { name: "Luc Bernard", role: "Coordinateur adjoint", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150" },
   ];
 
   if (!garden) {
@@ -357,7 +361,7 @@ En cas de non-respect répété, l'accès au jardin pourra être suspendu.
                         {coordinators.map((coordinator, index) => (
                           <div key={index} className="flex items-center gap-3">
                             <Avatar>
-                              <AvatarImage src={coordinator.avatar} />
+                              <AvatarImage src={coordinator.avatar} alt={coordinator.name} />
                               <AvatarFallback>{coordinator.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                             </Avatar>
                             <div>
@@ -432,7 +436,6 @@ En cas de non-respect répété, l'accès au jardin pourra être suspendu.
                       {gardenMembers.map((member, index) => (
                         <div key={index} className="flex items-center gap-3 p-4 border rounded-lg">
                           <Avatar className="h-12 w-12">
-                            <AvatarImage src={member.avatar} />
                             <AvatarFallback>{member.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                           </Avatar>
                           <div>

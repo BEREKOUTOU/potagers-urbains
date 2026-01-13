@@ -1,11 +1,7 @@
 import React, { useState, useEffect, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, RegisterData, AuthContextType, UpdateProfileData } from './authTypes';
-import { AuthContext, useAuth } from './AuthContextBase';
-
-interface AuthProviderProps {
-  children: ReactNode;
-}
+import { AuthContext } from './authHooks';
+import { User, RegisterData, UpdateProfileData, AuthContextType } from './authTypes';
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -117,16 +113,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     if (!token) throw new Error('No token available');
 
     try {
-      // Map camelCase to camelCase for backend (no change needed)
-      const mappedData: Record<string, string> = {};
-      if (userData.firstName !== undefined) mappedData.firstName = userData.firstName;
-      if (userData.lastName !== undefined) mappedData.lastName = userData.lastName;
-      if (userData.bio !== undefined) mappedData.bio = userData.bio;
-      if (userData.location !== undefined) mappedData.location = userData.location;
-      if (userData.region !== undefined) mappedData.region = userData.region;
-      if (userData.phone !== undefined) mappedData.phone = userData.phone;
-      if (userData.profilePictureUrl !== undefined) mappedData.profilePictureUrl = userData.profilePictureUrl;
-
       const response = await fetch(`${API_BASE_URL}/auth/profile`, {
         method: 'PUT',
         headers: {
@@ -134,7 +120,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           'Authorization': `Bearer ${token}`,
         },
         credentials: 'include',
-        body: JSON.stringify(mappedData),
+        body: JSON.stringify(userData),
       });
 
       const data = await response.json();

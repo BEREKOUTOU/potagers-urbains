@@ -16,7 +16,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Sprout, User, Mail, Phone, MapPin, Calendar, Edit, Settings, Shield, Trash2, Download, ExternalLink, Heart, BookOpen, Video, FileText, Plus, Activity, Users, Star, Camera, Loader2 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthContextBase";
 import { toast } from "sonner";
 
 const Profile = () => {
@@ -47,11 +47,13 @@ const Profile = () => {
     setIsLoading(true);
     try {
       await updateProfile({
-        first_name: userInfo.firstName,
-        last_name: userInfo.lastName,
+        firstName: userInfo.firstName,
+        lastName: userInfo.lastName,
         bio: userInfo.bio,
         location: userInfo.address, // Assuming address maps to location
         region: preferences.region,
+        profilePictureUrl: profileImage,
+        phone: userInfo.phone,
       });
       toast.success("Profil mis à jour avec succès");
       setIsEditing(false);

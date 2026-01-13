@@ -6,7 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sprout, User, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/AuthContextBase";
 import { toast } from "sonner";
 
 const Login = () => {
