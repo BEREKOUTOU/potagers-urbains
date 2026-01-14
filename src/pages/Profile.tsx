@@ -43,6 +43,33 @@ const Profile = () => {
     timezone: "Europe/Paris"
   });
 
+  const gardens = [
+    {
+      id: 1,
+      name: "Potager du balcon",
+      type: "Balcon",
+      status: "Actif",
+      createdDate: "15 mars 2024",
+      image: "Jardin_Balcon.jpg"
+    },
+    {
+      id: 2,
+      name: "Jardin communautaire",
+      type: "Communautaire",
+      status: "Actif",
+      createdDate: "2 avril 2024",
+      image: "Jardin_Balcon2.jpg"
+    },
+    {
+      id: 3,
+      name: "Terrasse aromatique",
+      type: "Terrasse",
+      status: "En pause",
+      createdDate: "10 mai 2024",
+      image: "Jardin-Balcon2.jpg"
+    }
+  ];
+
   // Update profile image and user info when user data changes
   useEffect(() => {
     if (user) {
@@ -453,32 +480,29 @@ const Profile = () => {
                 </Button>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[1, 2, 3].map((garden) => {
-                  const gardenImages = ['Jardin_Balcon.jpg', 'Jardin_Balcon2.jpg', 'Jardin-Balcon2.jpg'];
-                  return (
-                    <Card key={garden}>
-                      <CardContent className="p-0">
-                        <div className="grid grid-cols-3 gap-1">
-                          {gardenImages.map((img, idx) => (
-                            <img key={idx} src={`/assets/${img}`} alt={`Jardin ${idx - 2}`} className="w-full h-32 object-cover rounded-t-lg" />
-                          ))}
+                {gardens.map((garden) => (
+                  <Card key={garden.id}>
+                    <CardContent className="p-0">
+                      <img
+                        src={`/assets/${garden.image}`}
+                        alt={garden.name}
+                        className="w-full h-48 object-cover rounded-t-lg"
+                      />
+                      <div className="p-4">
+                        <h3 className="font-semibold mb-2">{garden.name}</h3>
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="secondary">{garden.type}</Badge>
+                          <Badge variant={garden.status === "Actif" ? "outline" : "secondary"}>{garden.status}</Badge>
                         </div>
-                        <div className="p-4">
-                          <h3 className="font-semibold mb-2">Jardin Balcon {garden}</h3>
-                          <div className="flex items-center gap-2 mb-2">
-                            <Badge variant="secondary">Balcon</Badge>
-                            <Badge variant="outline">Actif</Badge>
-                          </div>
-                          <p className="text-sm text-muted-foreground mb-4">Créé le 15 mars 2024</p>
-                          <Button className="w-full">
-                            <Sprout className="h-4 w-4 mr-2" />
-                            Accéder
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
+                        <p className="text-sm text-muted-foreground mb-4">Créé le {garden.createdDate}</p>
+                        <Button className="w-full">
+                          <Sprout className="h-4 w-4 mr-2" />
+                          Accéder
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
             </TabsContent>
 
