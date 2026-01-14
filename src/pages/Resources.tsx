@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import BackToTop from "@/components/BackToTop";
 import img from '../assets/img.jpg';
@@ -59,7 +60,9 @@ import { useNavigate } from "react-router-dom";
 
 const Resources = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("Tous");
+  const [selectedCategory, setSelectedCategory] = useState<string>("Tous");
+  const [selectedMonth, setSelectedMonth] = useState("Janvier");
+  const [selectedPlantCategory, setSelectedPlantCategory] = useState("Toutes les plantes");
   const navigate = useNavigate();
 
   const guides = [
@@ -95,58 +98,58 @@ const Resources = () => {
 
   const plantCards = [
     {
-      name: "Tomates",
+      name: "Tomates cerises",
       category: "Légumes",
-      season: "Printemps-Été",
-      difficulty: "Moyen",
-      image: tomate,
-      needs: "Soleil, Arrosage régulier",
-      planting: "Mars-Avril"
+      difficulty: "Facile",
+      planting: "Mars - Mai",
+      harvest: "Juillet - Octobre",
+      watering: "Modéré",
+      image: tomate
     },
     {
       name: "Basilic",
       category: "Herbes aromatiques",
-      season: "Été",
-      difficulty: "Facile",
-      image: basilic,
-      needs: "Soleil, Sol drainé",
-      planting: "Avril-Mai"
+      difficulty: "Très facile",
+      planting: "Avril - Juin",
+      harvest: "Mai - Octobre",
+      watering: "Régulier",
+      image: basilic
     },
     {
       name: "Radis",
       category: "Légumes",
-      season: "Printemps-Automne",
-      difficulty: "Facile",
-      image: radis,
-      needs: "Mi-ombre, Sol frais",
-      planting: "Toute l'année"
+      difficulty: "Très facile",
+      planting: "Mars - Septembre",
+      harvest: "Avril - Novembre",
+      watering: "Régulier",
+      image: radis
     },
     {
-      name: "Fraises",
+      name: "Fraisiers",
       category: "Fruits",
-      season: "Printemps-Été",
-      difficulty: "Moyen",
-      image: fraise,
-      needs: "Soleil, Sol acide",
-      planting: "Mars-Avril"
-    },
-    {
-      name: "Lavande",
-      category: "Fleurs",
-      season: "Été",
       difficulty: "Facile",
-      image: lavande,
-      needs: "Soleil, Sol sec",
-      planting: "Mars-Avril"
+      planting: "Mars - Mai",
+      harvest: "Mai - Juillet",
+      watering: "Régulier",
+      image: fraise
     },
     {
-      name: "Persil",
+      name: "Menthe",
       category: "Herbes aromatiques",
-      season: "Printemps-Automne",
+      difficulty: "Très facile",
+      planting: "Mars - Octobre",
+      harvest: "Avril - Novembre",
+      watering: "Abondant",
+      image: persil
+    },
+    {
+      name: "Pensées",
+      category: "Fleurs",
       difficulty: "Facile",
-      image: persil,
-      needs: "Mi-ombre, Sol riche",
-      planting: "Mars-Octobre"
+      planting: "Septembre - Novembre",
+      harvest: "Octobre - Mai",
+      watering: "Modéré",
+      image: lavande
     }
   ];
 
@@ -257,6 +260,81 @@ const Resources = () => {
     { title: "Tutoriel arrosage automatique", date: "Il y a 2 semaines" }
   ];
 
+  const calendarData: Record<string, Record<string, string[]>> = {
+    "Janvier": {
+      "À semer": ["Fèves", "Petits pois"],
+      "À planter": ["Tulipes", "Narcisses"],
+      "À récolter": ["Épinards", "Mâche", "Choux"],
+      "Entretien": ["Pailler", "Vider les réserves d'eau", "Rentrer les plantes fragiles"]
+    },
+    "Février": {
+      "À semer": ["Carottes", "Radis"],
+      "À planter": ["Ail", "Oignons"],
+      "À récolter": ["Choux", "Poireaux"],
+      "Entretien": ["Préparer les sols", "Nettoyer les outils"]
+    },
+    "Mars": {
+      "À semer": ["Tomates", "Poivrons"],
+      "À planter": ["Pommes de terre", "Haricots"],
+      "À récolter": ["Radis", "Laitues"],
+      "Entretien": ["Arroser régulièrement", "Fertiliser"]
+    },
+    "Avril": {
+      "À semer": ["Basilic", "Persil"],
+      "À planter": ["Tomates", "Concombres"],
+      "À récolter": ["Radis", "Carottes"],
+      "Entretien": ["Pailler les sols", "Surveiller les maladies"]
+    },
+    "Mai": {
+      "À semer": ["Haricots", "Courgettes"],
+      "À planter": ["Melons", "Pastèques"],
+      "À récolter": ["Laitues", "Épinards"],
+      "Entretien": ["Arroser en profondeur", "Taille des plantes"]
+    },
+    "Juin": {
+      "À semer": ["Carottes", "Betteraves"],
+      "À planter": ["Choux", "Brocolis"],
+      "À récolter": ["Fraises", "Framboises"],
+      "Entretien": ["Mulcher", "Protéger des parasites"]
+    },
+    "Juillet": {
+      "À semer": ["Épinards", "Mâche"],
+      "À planter": ["Ail d'automne"],
+      "À récolter": ["Tomates", "Concombres"],
+      "Entretien": ["Arroser matin/soir", "Récolter régulièrement"]
+    },
+    "Août": {
+      "À semer": ["Radis", "Laitues"],
+      "À planter": ["Échalotes"],
+      "À récolter": ["Haricots", "Courgettes"],
+      "Entretien": ["Pailler abondamment", "Surveiller l'humidité"]
+    },
+    "Septembre": {
+      "À semer": ["Fèves", "Petits pois"],
+      "À planter": ["Ail", "Oignons"],
+      "À récolter": ["Tomates", "Poivrons"],
+      "Entretien": ["Préparer l'automne", "Nettoyer les plates-bandes"]
+    },
+    "Octobre": {
+      "À semer": ["Blé", "Avoine"],
+      "À planter": ["Tulipes", "Jacinthes"],
+      "À récolter": ["Choux", "Poireaux"],
+      "Entretien": ["Rentrer les plantes sensibles", "Protéger du gel"]
+    },
+    "Novembre": {
+      "À semer": ["Épinards d'hiver"],
+      "À planter": ["Ail", "Oignons"],
+      "À récolter": ["Choux", "Betteraves"],
+      "Entretien": ["Pailler épais", "Préparer les abris"]
+    },
+    "Décembre": {
+      "À semer": ["Fèves"],
+      "À planter": ["Bulbes de printemps"],
+      "À récolter": ["Choux d'hiver", "Poireaux"],
+      "Entretien": ["Surveiller les gelées", "Planifier la saison prochaine"]
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -366,46 +444,68 @@ const Resources = () => {
               {(selectedCategory === "Tous" || selectedCategory === "Fiches plantes") && (
                 <section>
                   <h2 className="text-2xl font-bold text-foreground mb-6">Fiches Techniques par Plantes</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {plantCards.map((plant, index) => (
-                      <Card key={index} className="border-none shadow-lg hover:shadow-xl transition-all">
-                        <CardHeader>
-                          <img src={plant.image} alt={plant.name} className="w-100 h-100 object-cover rounded-lg flex-shrink-0" />
-                          <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
-                              <Leaf className="h-6 w-6 text-accent" />
-                            </div>
-                            <div>
-                              <CardTitle className="text-lg">{plant.name}</CardTitle>
-                              <Badge variant="outline" className="mt-1">{plant.category}</Badge>
-                            </div>
-                          </div>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                          <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div>
-                              <span className="text-muted-foreground">Saison:</span>
-                              <p className="font-medium">{plant.season}</p>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Difficulté:</span>
-                              <p className="font-medium">{plant.difficulty}</p>
-                            </div>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground text-sm">Besoins:</span>
-                            <p className="text-sm">{plant.needs}</p>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground text-sm">Plantation:</span>
-                            <p className="text-sm font-medium">{plant.planting}</p>
-                          </div>
-                        </CardContent>
-                        <CardFooter>
-                          <Button variant="outline" className="w-full">Voir la fiche complète</Button>
-                        </CardFooter>
-                      </Card>
+
+                  {/* Plant Category Filters */}
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    {["Toutes les plantes", "Légumes", "Herbes aromatiques", "Fruits", "Fleurs"].map((category) => (
+                      <Button
+                        key={category}
+                        variant={selectedPlantCategory === category ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setSelectedPlantCategory(category)}
+                      >
+                        {category}
+                        {category === "Toutes les plantes" && (
+                          <Badge variant="secondary" className="ml-2 text-xs">
+                            {plantCards.length}
+                          </Badge>
+                        )}
+                      </Button>
                     ))}
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {plantCards
+                      .filter(plant => selectedPlantCategory === "Toutes les plantes" || plant.category === selectedPlantCategory)
+                      .map((plant, index) => (
+                        <Card key={index} className="border-none shadow-lg hover:shadow-xl transition-all">
+                          <CardHeader>
+                            <img src={plant.image} alt={plant.name} className="w-100 h-100 object-cover rounded-lg flex-shrink-0" />
+                            <div className="flex items-center gap-3">
+                              <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
+                                <Leaf className="h-6 w-6 text-accent" />
+                              </div>
+                              <div>
+                                <CardTitle className="text-lg">{plant.name}</CardTitle>
+                                <Badge variant="outline" className="mt-1">{plant.category}</Badge>
+                              </div>
+                            </div>
+                          </CardHeader>
+                          <CardContent className="space-y-3">
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                              <div>
+                                <span className="text-muted-foreground">Plantation:</span>
+                                <p className="font-medium">{plant.planting}</p>
+                              </div>
+                              <div>
+                                <span className="text-muted-foreground">Récolte:</span>
+                                <p className="font-medium">{plant.harvest}</p>
+                              </div>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground text-sm">Arrosage:</span>
+                              <p className="text-sm">{plant.watering}</p>
+                            </div>
+                            <div>
+                              <span className="text-muted-foreground text-sm">Difficulté:</span>
+                              <p className="text-sm font-medium">{plant.difficulty}</p>
+                            </div>
+                          </CardContent>
+                          <CardFooter>
+                            <Button variant="outline" className="w-full">Voir la fiche complète</Button>
+                          </CardFooter>
+                        </Card>
+                      ))}
                   </div>
                 </section>
               )}
@@ -422,59 +522,35 @@ const Resources = () => {
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <Tabs defaultValue="legumes" className="w-full">
-                        <TabsList className="grid w-full grid-cols-4">
-                          <TabsTrigger value="legumes">Légumes</TabsTrigger>
-                          <TabsTrigger value="herbes">Herbes</TabsTrigger>
-                          <TabsTrigger value="fruits">Fruits</TabsTrigger>
-                          <TabsTrigger value="fleurs">Fleurs</TabsTrigger>
-                        </TabsList>
-                        <TabsContent value="legumes" className="mt-6">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                              <h4 className="font-semibold mb-3">Mars - Avril</h4>
-                              <div className="space-y-2">
-                                <div className="flex items-center gap-2">
-                                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                                  <span className="text-sm">Semis intérieur: tomates, poivrons</span>
+                      <div className="mb-6">
+                        <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Sélectionnez un mois" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {Object.keys(calendarData).map((month) => (
+                              <SelectItem key={month} value={month}>
+                                {month}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="flex flex-col md:flex-row gap-24">
+                        {Object.entries(calendarData[selectedMonth]).map(([category, activities]) => (
+                          <div key={category} className="space-y-3">
+                            <h4 className="font-semibold mb-3 text-primary">{category}</h4>
+                            <div className="space-y-2">
+                              {activities.map((activity, index) => (
+                                <div key={index} className="flex items-center gap-2">
+                                  <div className="w-3 h-3 bg-primary rounded-full flex-shrink-0"></div>
+                                  <span className="text-sm">{activity}</span>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-                                  <span className="text-sm">Plantation: radis, laitues</span>
-                                </div>
-                              </div>
-                            </div>
-                            <div>
-                              <h4 className="font-semibold mb-3">Mai - Juin</h4>
-                              <div className="space-y-2">
-                                <div className="flex items-center gap-2">
-                                  <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-                                  <span className="text-sm">Récolte: radis, laitues</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                                  <span className="text-sm">Semis direct: haricots, carottes</span>
-                                </div>
-                              </div>
+                              ))}
                             </div>
                           </div>
-                        </TabsContent>
-                        <TabsContent value="herbes" className="mt-6">
-                          <div className="text-center py-8 text-muted-foreground">
-                            Calendrier des herbes aromatiques à venir
-                          </div>
-                        </TabsContent>
-                        <TabsContent value="fruits" className="mt-6">
-                          <div className="text-center py-8 text-muted-foreground">
-                            Calendrier des fruits à venir
-                          </div>
-                        </TabsContent>
-                        <TabsContent value="fleurs" className="mt-6">
-                          <div className="text-center py-8 text-muted-foreground">
-                            Calendrier des fleurs à venir
-                          </div>
-                        </TabsContent>
-                      </Tabs>
+                        ))}
+                      </div>
                     </CardContent>
                     <CardFooter>
                       <Button className="w-full">
