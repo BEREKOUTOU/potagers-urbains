@@ -244,11 +244,10 @@ const Resources = () => {
   ];
 
   const popularResources = [
-    { title: "Guide débutant potager", type: "Guide", views: 2500 },
-    { title: "Calendrier plantation", type: "Outil", views: 1800 },
-    { title: "Fiche tomates", type: "Fiche", views: 1600 },
-    { title: "Vidéo compostage", type: "Vidéo", views: 1400 },
-    { title: "Guide balcon", type: "Guide", views: 1200 }
+    { title: "Guide débutant", type: "PDF", views: 3400 },
+    { title: "Calendrier 2024", type: "PDF", views: 5600 },
+    { title: "Planter des tomates", type: "Vidéo", views: 12500 },
+    { title: "Basilic - Fiche", type: "Fiche", views: 2100 }
   ];
 
   const recentResources = [
@@ -683,6 +682,20 @@ const Resources = () => {
                     <ImageIcon className="mr-2 h-4 w-4" />
                     Ajouter une fiche plante
                   </Button>
+                </CardContent>
+              </Card>
+
+              {/* Newsletter */}
+              <Card className="border-none shadow-lg">
+                <CardHeader>
+                  <CardTitle className="text-lg">Newsletter Ressources</CardTitle>
+                  <CardDescription>
+                    Recevez les nouvelles ressources chaque semaine
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <Input placeholder="Votre mail" />
+                  <Button className="w-full">S'abonner</Button>
                 </CardContent>
               </Card>
             </div>
