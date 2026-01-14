@@ -39,7 +39,7 @@ router.post('/register', validate(registerSchema), async (req, res): Promise<voi
     const result = await pool.query(
       `INSERT INTO users (username, email, password_hash, first_name, last_name, location, region, bio)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-       RETURNING id, username, email, first_name, last_name, location, region, bio, join_date`,
+       RETURNING id, username, email, first_name, last_name, profile_picture_url, bio, location, region, phone, join_date`,
       [username, email, hashedPassword, firstName, lastName, location, region, bio]
     );
 
@@ -71,7 +71,7 @@ router.post('/login', validate(loginSchema), async (req, res): Promise<void> => 
 
     // Find user by email or username
     const result = await pool.query(
-      'SELECT id, username, email, password_hash, first_name, last_name, role, is_active FROM users WHERE email = $1 OR username = $1',
+      'SELECT id, username, email, password_hash, first_name, last_name, profile_picture_url, bio, location, region, phone, join_date, last_login, role, is_active FROM users WHERE email = $1 OR username = $1',
       [email]
     );
 

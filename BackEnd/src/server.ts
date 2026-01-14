@@ -5,6 +5,9 @@ import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
+import multer from 'multer';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { pool } from './config/database.ts';
 import authRoutes from './routes/auth.ts';
 import userRoutes from './routes/users.ts';
@@ -17,6 +20,46 @@ import statRoutes from './routes/stats.ts';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+
+// Get __dirname equivalent for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    let uploadPath = 'uploads/temp/'; // default
+
+    if (req.path.includes('/photos')) {
+      uploadPath = 'uploads/photos/';
+    } else if (req.path.includes('/events')) {
+      uploadPath = 'uploads/events/';
+    }
+
+    cb(null, path.join(__dirname, '..', uploadPath));
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const fileFilter = (req: Express.Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+  // Accept images only
+  if (file.mimetype.startsWith('image/')) {
+    cb(null, true);
+  } else {
+    cb(new Error('Only image files are allowed!'));
+  }
+};
+
+export const upload = multer({
+  storage: storage,
+  fileFilter: fileFilter,
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB limit
+  }
+});
 
 // Swagger configuration
 const swaggerOptions = {
@@ -80,6 +123,9 @@ app.use(morgan('combined'));
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Static file serving for uploads
+app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
 // Swagger documentation
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));

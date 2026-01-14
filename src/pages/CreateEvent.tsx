@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BackToTop from "@/components/BackToTop";
@@ -52,6 +52,7 @@ interface FormErrors {
 }
 
 const CreateEvent = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<EventFormData>({
     title: "",
     date: undefined,
@@ -103,11 +104,44 @@ const CreateEvent = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      // TODO: Submit form data
-      console.log("Form submitted:", formData);
+      try {
+        const formDataToSend = new FormData();
+        formDataToSend.append('title', formData.title);
+        formDataToSend.append('description', formData.description);
+        formDataToSend.append('startDate', formData.date.toISOString());
+        formDataToSend.append('endDate', formData.date.toISOString()); // Same day event
+        formDataToSend.append('location', formData.location);
+        formDataToSend.append('maxAttendees', formData.capacity);
+        formDataToSend.append('eventType', formData.category);
+        formDataToSend.append('isPublic', 'true');
+
+        if (formData.image) {
+          formDataToSend.append('image', formData.image);
+        }
+
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/events', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+          body: formDataToSend,
+        });
+
+        if (response.ok) {
+          alert('Événement créé avec succès!');
+          navigate('/communaute');
+        } else {
+          const errorData = await response.json();
+          alert(errorData.error || 'Erreur lors de la création de l\'événement');
+        }
+      } catch (error) {
+        console.error('Error creating event:', error);
+        alert('Erreur lors de la création de l\'événement');
+      }
     }
   };
 

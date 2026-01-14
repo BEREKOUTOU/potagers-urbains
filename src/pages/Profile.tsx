@@ -23,14 +23,14 @@ const Profile = () => {
   const { user, updateProfile } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [profileImage, setProfileImage] = useState("/photo-profil.jpg");
+  const [profileImage, setProfileImage] = useState(user?.profile_picture_url || "/photo-profil.jpg");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [userInfo, setUserInfo] = useState({
     firstName: user?.first_name || "Jean",
     lastName: user?.last_name || "Dupont",
     email: user?.email || "jean.dupont@email.com",
-    phone: "+33 6 12 34 56 78",
-    address: "123 Rue des Jardins, 75001 Paris",
+    phone: user?.phone || "+33 6 12 34 56 78",
+    address: user?.location || "123 Rue des Jardins, 75001 Paris",
     bio: user?.bio || "Passionné de jardinage urbain et de permaculture. J'adore partager mes connaissances sur les jardins connectés."
   });
 
@@ -42,6 +42,25 @@ const Profile = () => {
     language: "Français",
     timezone: "Europe/Paris"
   });
+
+  // Update profile image and user info when user data changes
+  useEffect(() => {
+    if (user) {
+      setProfileImage(user.profile_picture_url || "/photo-profil.jpg");
+      setUserInfo({
+        firstName: user.first_name || "Jean",
+        lastName: user.last_name || "Dupont",
+        email: user.email || "jean.dupont@email.com",
+        phone: user.phone || "+33 6 12 34 56 78",
+        address: user.location || "123 Rue des Jardins, 75001 Paris",
+        bio: user.bio || "Passionné de jardinage urbain et de permaculture. J'adore partager mes connaissances sur les jardins connectés."
+      });
+      setPreferences(prev => ({
+        ...prev,
+        region: user.region || "Île-de-France"
+      }));
+    }
+  }, [user]);
 
   const handleSave = async () => {
     setIsLoading(true);

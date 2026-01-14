@@ -1,6 +1,7 @@
 import express from 'express';
 import { pool } from '../config/database.ts';
 import { authenticateToken } from '../middleware/auth.ts';
+import { upload } from '../config/multer.ts';
 
 type AuthRequest = express.Request & {
   user?: {
@@ -90,10 +91,16 @@ router.get('/:id', async (req, res): Promise<void> => {
 });
 
 // Upload new photo
-router.post('/', authenticateToken, async (req, res): Promise<void> => {
+router.post('/', authenticateToken, upload.single('photo'), async (req, res): Promise<void> => {
   try {
     const userId = (req as AuthRequest).user!.id;
-    const { title, description, imageUrl, gardenId, tags, isPublic } = req.body;
+    const { title, description, gardenId, tags, isPublic } = req.body;
+
+    // Check if file was uploaded
+    if (!req.file) {
+      res.status(400).json({ error: 'No photo file provided' });
+      return;
+    }
 
     // If gardenId is provided, check if user is a member of that garden
     if (gardenId) {
@@ -108,11 +115,14 @@ router.post('/', authenticateToken, async (req, res): Promise<void> => {
       }
     }
 
+    // Create the image URL path
+    const imageUrl = `/uploads/photos/${req.file.filename}`;
+
     const result = await pool.query(
       `INSERT INTO photos (title, description, image_url, uploaded_by, garden_id, tags, is_public)
        VALUES ($1, $2, $3, $4, $5, $6, $7)
        RETURNING *`,
-      [title, description, imageUrl, userId, gardenId, tags, isPublic !== false]
+      [title, description, imageUrl, userId, gardenId, tags ? JSON.parse(tags) : null, isPublic !== 'false']
     );
 
     const photo = result.rows[0];
@@ -171,7 +181,8 @@ router.put('/:id', authenticateToken, async (req, res): Promise<void> => {
   }
 });
 
-// Delete photo
+// Del
+// ete photo
 router.delete('/:id', authenticateToken, async (req, res): Promise<void> => {
   try {
     const { id } = req.params;
