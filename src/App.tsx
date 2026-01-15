@@ -12,6 +12,7 @@ const Index = lazy(() => import("./pages/Index"));
 const MyGardens = lazy(() => import("./pages/MyGardens"));
 const Community = lazy(() => import("./pages/Community"));
 const Resources = lazy(() => import("./pages/Resources"));
+const AllVideos = lazy(() => import("./pages/AllVideos"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Signup = lazy(() => import("./pages/Signup"));
 const Login = lazy(() => import("./pages/Login"));
@@ -78,6 +79,7 @@ const App = () => (
                 </ProtectedRoute>
               } />
               <Route path="/ressources" element={<Resources />} />
+              <Route path="/videos" element={<AllVideos />} />
               <Route path="/guide/:title" element={<GuideDetail />} />
               <Route path="/evenements/creer" element={
                 <ProtectedRoute>

@@ -646,6 +646,12 @@ const Resources = () => {
                       </Card>
                     ))}
                   </div>
+                  <div className="flex justify-center mt-6">
+                    <Button variant="outline" onClick={() => navigate('/videos')}>
+                      <Plus className="mr-2 h-4 w-4" />
+                      Voir plus
+                    </Button>
+                  </div>
                 </section>
               )}
 
