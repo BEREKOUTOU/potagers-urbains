@@ -30,6 +30,7 @@ const PersonalGardenDetails = lazy(() => import("./pages/PersonalGardenDetails")
 const CreateEvent = lazy(() => import("./pages/CreateEvent"));
 const SharePhoto = lazy(() => import("./pages/SharePhoto"));
 const GuideDetail = lazy(() => import("./pages/GuideDetail"));
+const CreateSharedGarden = lazy(() => import("./pages/CreateSharedGarden"));
 
 const queryClient = new QueryClient();
 
@@ -100,6 +101,7 @@ const App = () => (
               <Route path="/jardin/:id" element={<GardenDetails />} />
               <Route path="/jardin-stats/:id" element={<GardenStats />} />
               <Route path="/ia-fonctionnalites" element={<AIFeatures />} />
+              <Route path="/creer-jardin-partage" element={<CreateSharedGarden />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

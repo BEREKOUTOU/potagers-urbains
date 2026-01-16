@@ -441,7 +441,7 @@ const DiscoverGardens = (): JSX.Element => {
           <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
             Créez votre propre espace de jardinage urbain et rejoignez notre communauté
           </p>
-          <Button size="lg" variant="secondary" className="shadow-lg">
+          <Button size="lg" variant="secondary" className="shadow-lg" onClick={() => navigate('/creer-jardin-partage')}>
             <Plus className="h-5 w-5 mr-2" />
             Créer mon jardin
           </Button>
