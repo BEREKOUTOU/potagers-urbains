@@ -26,11 +26,17 @@ async function setupDatabase() {
         bio TEXT,
         location VARCHAR(100),
         region VARCHAR(100),
+        phone VARCHAR(20),
         join_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         last_login TIMESTAMP,
         is_active BOOLEAN DEFAULT TRUE,
         role VARCHAR(20) DEFAULT 'member' CHECK (role IN ('member', 'moderator', 'admin'))
       );
+    `);
+
+    // Add phone column if it doesn't exist (for existing databases)
+    await pool.query(`
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS phone VARCHAR(20);
     `);
 
     // Create gardens table
@@ -185,6 +191,47 @@ async function setupDatabase() {
       );
     `);
 
+    // Create user_preferences table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS user_preferences (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        email_notifications BOOLEAN DEFAULT TRUE,
+        push_notifications BOOLEAN DEFAULT FALSE,
+        weekly_summary BOOLEAN DEFAULT TRUE,
+        language VARCHAR(10) DEFAULT 'fr',
+        timezone VARCHAR(50) DEFAULT 'Europe/Paris',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id)
+      );
+    `);
+
+    // Create favorites table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS favorites (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        item_type VARCHAR(20) NOT NULL CHECK (item_type IN ('garden', 'resource', 'guide', 'event')),
+        item_id INTEGER NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id, item_type, item_id)
+      );
+    `);
+
+    // Create activity_log table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS activity_log (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        activity_type VARCHAR(50) NOT NULL,
+        description TEXT NOT NULL,
+        entity_type VARCHAR(50),
+        entity_id INTEGER,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
     console.log('Tables created successfully');
 
     // Create indexes for performance
@@ -202,6 +249,11 @@ async function setupDatabase() {
     await pool.query(`CREATE INDEX IF NOT EXISTS idx_discussions_created_at ON discussions(created_at);`);
     await pool.query(`CREATE INDEX IF NOT EXISTS idx_photos_garden_id ON photos(garden_id);`);
     await pool.query(`CREATE INDEX IF NOT EXISTS idx_photos_upload_date ON photos(upload_date);`);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_favorites_user_id ON favorites(user_id);`);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_favorites_item_type ON favorites(item_type);`);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_activity_log_user_id ON activity_log(user_id);`);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_activity_log_created_at ON activity_log(created_at);`);
+    await pool.query(`CREATE INDEX IF NOT EXISTS idx_user_preferences_user_id ON user_preferences(user_id);`);
 
     console.log('Indexes created successfully');
 

@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { pool } from '../config/database.ts';
 import { authenticateToken } from '../middleware/auth.ts';
 import { validate, registerSchema, loginSchema, updateProfileSchema } from '../middleware/validation.ts';
+import { logActivity } from '../middleware/activityLogger.ts';
 
 type AuthRequest = express.Request & {
   user?: {
@@ -51,6 +52,9 @@ router.post('/register', validate(registerSchema), async (req, res): Promise<voi
       process.env.JWT_SECRET!,
       { expiresIn: process.env.JWT_EXPIRES_IN || '7d' } as jwt.SignOptions
     );
+
+    // Log activity
+    await logActivity(user.id, 'user_registered', `Nouvel utilisateur inscrit: ${user.username}`);
 
     res.status(201).json({
       message: 'User registered successfully',
@@ -101,6 +105,9 @@ router.post('/login', validate(loginSchema), async (req, res): Promise<void> => 
       'UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = $1',
       [user.id]
     );
+
+    // Log activity
+    await logActivity(user.id, 'user_login', `Connexion réussie`);
 
     // Generate JWT token
     const token = jwt.sign(
@@ -219,6 +226,9 @@ router.put('/profile', authenticateToken, validate(updateProfileSchema), async (
       res.status(404).json({ error: 'User not found' });
       return;
     }
+
+    // Log activity
+    await logActivity(userId, 'profile_updated', `Profil mis à jour`);
 
     res.json({
       message: 'Profile updated successfully',

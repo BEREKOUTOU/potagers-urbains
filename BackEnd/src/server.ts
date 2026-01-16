@@ -17,6 +17,7 @@ import discussionRoutes from './routes/discussions.ts';
 import resourceRoutes from './routes/resources.ts';
 import photoRoutes from './routes/photos.ts';
 import statRoutes from './routes/stats.ts';
+import { errorHandler } from './middleware/errorHandler.ts';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -97,7 +98,10 @@ const swaggerOptions = {
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
 // Security middleware
-// app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginEmbedderPolicy: false
+}));
 
 // CORS configuration - must be before other middleware
 app.use(cors({
@@ -145,19 +149,13 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-// Error handling middleware
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error(err.stack);
-  // Ensure CORS headers are set even on errors
-  if (!res.headersSent) {
-    res.status(500).json({ error: 'Something went wrong!' });
-  }
-});
-
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
+
+// Error handling middleware (must be last)
+app.use(errorHandler);
 
 // Start server
 app.listen(PORT, () => {

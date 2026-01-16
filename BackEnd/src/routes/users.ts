@@ -225,6 +225,279 @@ router.get('/:id/gardens', authenticateToken, async (req, res): Promise<void> =>
   }
 });
 
+// Get user preferences
+router.get('/:id/preferences', authenticateToken, async (req, res): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const authReq = req as AuthRequest;
+    if (!authReq.user) {
+      res.status(401).json({ error: 'Authentication required' });
+      return;
+    }
+
+    if (!id) {
+      res.status(400).json({ error: 'User ID is required' });
+      return;
+    }
+
+    const currentUserId = authReq.user.id;
+    if (parseInt(id) !== currentUserId && authReq.user.role !== 'admin') {
+      res.status(403).json({ error: 'Access denied' });
+      return;
+    }
+
+    let result = await pool.query(
+      `SELECT * FROM user_preferences WHERE user_id = $1`,
+      [parseInt(id)]
+    );
+
+    // Create default preferences if not exists
+    if (result.rows.length === 0) {
+      result = await pool.query(
+        `INSERT INTO user_preferences (user_id, email_notifications, push_notifications, weekly_summary, language, timezone)
+         VALUES ($1, true, false, true, 'fr', 'Europe/Paris')
+         RETURNING *`,
+        [parseInt(id)]
+      );
+    }
+
+    res.json({ preferences: result.rows[0] });
+  } catch (error) {
+    console.error('Get user preferences error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Update user preferences
+router.put('/:id/preferences', authenticateToken, async (req, res): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const authReq = req as AuthRequest;
+    if (!authReq.user) {
+      res.status(401).json({ error: 'Authentication required' });
+      return;
+    }
+
+    if (!id) {
+      res.status(400).json({ error: 'User ID is required' });
+      return;
+    }
+
+    const currentUserId = authReq.user.id;
+    if (parseInt(id) !== currentUserId && authReq.user.role !== 'admin') {
+      res.status(403).json({ error: 'Access denied' });
+      return;
+    }
+
+    const { emailNotifications, pushNotifications, weeklySummary, language, timezone } = req.body;
+
+    const updates: string[] = [];
+    const values: (string | boolean | number)[] = [];
+    let paramIndex = 1;
+
+    if (emailNotifications !== undefined) {
+      updates.push(`email_notifications = $${paramIndex++}`);
+      values.push(emailNotifications);
+    }
+    if (pushNotifications !== undefined) {
+      updates.push(`push_notifications = $${paramIndex++}`);
+      values.push(pushNotifications);
+    }
+    if (weeklySummary !== undefined) {
+      updates.push(`weekly_summary = $${paramIndex++}`);
+      values.push(weeklySummary);
+    }
+    if (language !== undefined) {
+      updates.push(`language = $${paramIndex++}`);
+      values.push(language);
+    }
+    if (timezone !== undefined) {
+      updates.push(`timezone = $${paramIndex++}`);
+      values.push(timezone);
+    }
+
+    if (updates.length === 0) {
+      res.status(400).json({ error: 'No fields to update' });
+      return;
+    }
+
+    updates.push(`updated_at = CURRENT_TIMESTAMP`);
+    values.push(parseInt(id));
+
+    const result = await pool.query(
+      `INSERT INTO user_preferences (user_id, email_notifications, push_notifications, weekly_summary, language, timezone)
+       VALUES ($${paramIndex}, $1, $2, $3, $4, $5)
+       ON CONFLICT (user_id) DO UPDATE
+       SET ${updates.join(', ')}
+       RETURNING *`,
+      values
+    );
+
+    res.json({
+      message: 'Preferences updated successfully',
+      preferences: result.rows[0]
+    });
+  } catch (error) {
+    console.error('Update preferences error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Get user favorites
+router.get('/:id/favorites', authenticateToken, async (req, res): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const authReq = req as AuthRequest;
+    if (!authReq.user) {
+      res.status(401).json({ error: 'Authentication required' });
+      return;
+    }
+
+    if (!id) {
+      res.status(400).json({ error: 'User ID is required' });
+      return;
+    }
+
+    const currentUserId = authReq.user.id;
+    if (parseInt(id) !== currentUserId && authReq.user.role !== 'admin') {
+      res.status(403).json({ error: 'Access denied' });
+      return;
+    }
+
+    const result = await pool.query(
+      `SELECT * FROM favorites WHERE user_id = $1 ORDER BY created_at DESC`,
+      [parseInt(id)]
+    );
+
+    res.json({ favorites: result.rows });
+  } catch (error) {
+    console.error('Get favorites error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Add favorite
+router.post('/:id/favorites', authenticateToken, async (req, res): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const authReq = req as AuthRequest;
+    if (!authReq.user) {
+      res.status(401).json({ error: 'Authentication required' });
+      return;
+    }
+
+    if (!id) {
+      res.status(400).json({ error: 'User ID is required' });
+      return;
+    }
+
+    const currentUserId = authReq.user.id;
+    if (parseInt(id) !== currentUserId) {
+      res.status(403).json({ error: 'Access denied' });
+      return;
+    }
+
+    const { itemType, itemId } = req.body;
+
+    if (!itemType || !itemId) {
+      res.status(400).json({ error: 'itemType and itemId are required' });
+      return;
+    }
+
+    const result = await pool.query(
+      `INSERT INTO favorites (user_id, item_type, item_id)
+       VALUES ($1, $2, $3)
+       ON CONFLICT (user_id, item_type, item_id) DO NOTHING
+       RETURNING *`,
+      [parseInt(id), itemType, itemId]
+    );
+
+    res.status(201).json({
+      message: 'Favorite added successfully',
+      favorite: result.rows[0]
+    });
+  } catch (error) {
+    console.error('Add favorite error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Remove favorite
+router.delete('/:id/favorites/:favoriteId', authenticateToken, async (req, res): Promise<void> => {
+  try {
+    const { id, favoriteId } = req.params;
+    const authReq = req as AuthRequest;
+    if (!authReq.user) {
+      res.status(401).json({ error: 'Authentication required' });
+      return;
+    }
+
+    if (!id || !favoriteId) {
+      res.status(400).json({ error: 'User ID and Favorite ID are required' });
+      return;
+    }
+
+    const currentUserId = authReq.user.id;
+    if (parseInt(id) !== currentUserId) {
+      res.status(403).json({ error: 'Access denied' });
+      return;
+    }
+
+    const result = await pool.query(
+      `DELETE FROM favorites WHERE id = $1 AND user_id = $2 RETURNING *`,
+      [parseInt(favoriteId), parseInt(id)]
+    );
+
+    if (result.rows.length === 0) {
+      res.status(404).json({ error: 'Favorite not found' });
+      return;
+    }
+
+    res.json({ message: 'Favorite removed successfully' });
+  } catch (error) {
+    console.error('Remove favorite error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Get user activity log
+router.get('/:id/activities', authenticateToken, async (req, res): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const authReq = req as AuthRequest;
+    if (!authReq.user) {
+      res.status(401).json({ error: 'Authentication required' });
+      return;
+    }
+
+    if (!id) {
+      res.status(400).json({ error: 'User ID is required' });
+      return;
+    }
+
+    const currentUserId = authReq.user.id;
+    if (parseInt(id) !== currentUserId && authReq.user.role !== 'admin') {
+      res.status(403).json({ error: 'Access denied' });
+      return;
+    }
+
+    const { limit = '50', offset = '0' } = req.query;
+
+    const result = await pool.query(
+      `SELECT * FROM activity_log 
+       WHERE user_id = $1 
+       ORDER BY created_at DESC 
+       LIMIT $2 OFFSET $3`,
+      [parseInt(id), parseInt(limit as string), parseInt(offset as string)]
+    );
+
+    res.json({ activities: result.rows });
+  } catch (error) {
+    console.error('Get activities error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export default router;
 
 

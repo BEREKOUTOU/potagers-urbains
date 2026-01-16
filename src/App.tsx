@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { PreferencesProvider } from "@/contexts/PreferencesContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
 // Lazy load components for code splitting
@@ -39,8 +40,9 @@ const App = () => (
       <Sonner />
       <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <AuthProvider>
-          <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
-            <Routes>
+          <PreferencesProvider>
+            <Suspense fallback={<div className="flex items-center justify-center h-screen">Loading...</div>}>
+              <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/mes-jardins" element={
                 <ProtectedRoute>
@@ -102,6 +104,7 @@ const App = () => (
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
+        </PreferencesProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>

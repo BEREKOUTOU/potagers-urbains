@@ -1,5 +1,9 @@
-import { Request, Response, NextFunction } from 'express';
+import express from 'express';
 import { z } from 'zod';
+
+type Request = express.Request;
+type Response = express.Response;
+type NextFunction = express.NextFunction;
 
 // Auth validation schemas
 export const registerSchema = z.object({

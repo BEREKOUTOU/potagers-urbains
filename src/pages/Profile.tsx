@@ -17,12 +17,19 @@ import { Sprout, User, Mail, Phone, MapPin, Calendar, Edit, Settings, Shield, Tr
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContextBase";
+import { usePreferences } from "@/contexts/PreferencesContext";
+import { useFavorites } from "@/hooks/useFavorites";
+import { useActivities } from "@/hooks/useActivities";
 import { toast } from "sonner";
 
 const Profile = () => {
   const { user, updateProfile } = useAuth();
+  const { preferences: userPreferences, updatePreferences } = usePreferences();
+  const { favorites } = useFavorites();
+  const { activities } = useActivities();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSavingPreferences, setIsSavingPreferences] = useState(false);
   const [profileImage, setProfileImage] = useState(user?.profile_picture_url || "/photo-profil.jpg");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [userInfo, setUserInfo] = useState({
@@ -35,12 +42,12 @@ const Profile = () => {
   });
 
   const [preferences, setPreferences] = useState({
-    emailNotifications: true,
-    pushNotifications: false,
-    weeklySummary: true,
+    emailNotifications: userPreferences.emailNotifications,
+    pushNotifications: userPreferences.pushNotifications,
+    weeklySummary: userPreferences.weeklySummary,
     region: user?.region || "Île-de-France",
-    language: "Français",
-    timezone: "Europe/Paris"
+    language: userPreferences.language,
+    timezone: userPreferences.timezone
   });
 
   const gardens = [
@@ -89,6 +96,18 @@ const Profile = () => {
     }
   }, [user]);
 
+  // Update preferences when userPreferences changes
+  useEffect(() => {
+    setPreferences(prev => ({
+      ...prev,
+      emailNotifications: userPreferences.emailNotifications,
+      pushNotifications: userPreferences.pushNotifications,
+      weeklySummary: userPreferences.weeklySummary,
+      language: userPreferences.language,
+      timezone: userPreferences.timezone
+    }));
+  }, [userPreferences]);
+
   const handleSave = async () => {
     setIsLoading(true);
     try {
@@ -114,6 +133,25 @@ const Profile = () => {
   const handleCancel = () => {
     setIsEditing(false);
     // Reset to original values if needed
+  };
+
+  const handleSavePreferences = async () => {
+    setIsSavingPreferences(true);
+    try {
+      await updatePreferences({
+        emailNotifications: preferences.emailNotifications,
+        pushNotifications: preferences.pushNotifications,
+        weeklySummary: preferences.weeklySummary,
+        language: preferences.language,
+        timezone: preferences.timezone
+      });
+      toast.success("Préférences mises à jour avec succès");
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour des préférences:", error);
+      toast.error("Erreur lors de la mise à jour des préférences");
+    } finally {
+      setIsSavingPreferences(false);
+    }
   };
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -408,6 +446,19 @@ const Profile = () => {
                 </Card>
               </div>
 
+              <div className="flex gap-2">
+                <Button onClick={handleSavePreferences} disabled={isSavingPreferences}>
+                  {isSavingPreferences ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Sauvegarde...
+                    </>
+                  ) : (
+                    "Sauvegarder les préférences"
+                  )}
+                </Button>
+              </div>
+
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -435,36 +486,27 @@ const Profile = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="flex items-start gap-4 p-4 border rounded-lg">
-                      <Sprout className="h-8 w-8 text-green-600 mt-1" />
-                      <div className="flex-1">
-                        <p className="font-medium">Jardin "Balcon Fleuri" créé</p>
-                        <p className="text-sm text-muted-foreground">15 mars 2024</p>
-                      </div>
-                      <Button variant="ghost" size="sm">
-                        <ExternalLink className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <div className="flex items-start gap-4 p-4 border rounded-lg">
-                      <BookOpen className="h-8 w-8 text-blue-600 mt-1" />
-                      <div className="flex-1">
-                        <p className="font-medium">Guide "Permaculture Urbaine" téléchargé</p>
-                        <p className="text-sm text-muted-foreground">12 mars 2024</p>
-                      </div>
-                      <Button variant="ghost" size="sm">
-                        <ExternalLink className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <div className="flex items-start gap-4 p-4 border rounded-lg">
-                      <Users className="h-8 w-8 text-purple-600 mt-1" />
-                      <div className="flex-1">
-                        <p className="font-medium">Commentaire posté sur "Conseils d'arrosage"</p>
-                        <p className="text-sm text-muted-foreground">10 mars 2024</p>
-                      </div>
-                      <Button variant="ghost" size="sm">
-                        <ExternalLink className="h-4 w-4" />
-                      </Button>
-                    </div>
+                    {activities.length === 0 ? (
+                      <p className="text-center text-muted-foreground py-8">Aucune activité récente</p>
+                    ) : (
+                      activities.map((activity) => (
+                        <div key={activity.id} className="flex items-start gap-4 p-4 border rounded-lg">
+                          <Activity className="h-8 w-8 text-green-600 mt-1" />
+                          <div className="flex-1">
+                            <p className="font-medium">{activity.description}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {new Date(activity.created_at).toLocaleDateString('fr-FR', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </p>
+                          </div>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -520,42 +562,29 @@ const Profile = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex items-center gap-4">
-                        <BookOpen className="h-8 w-8 text-blue-600" />
-                        <div>
-                          <p className="font-medium">Guide de Permaculture</p>
-                          <p className="text-sm text-muted-foreground">Guide • Ajouté le 10 mars 2024</p>
+                    {favorites.length === 0 ? (
+                      <p className="text-center text-muted-foreground py-8">Aucun favori pour le moment</p>
+                    ) : (
+                      favorites.map((favorite) => (
+                        <div key={favorite.id} className="flex items-center justify-between p-4 border rounded-lg">
+                          <div className="flex items-center gap-4">
+                            {favorite.item_type === 'resource' && <BookOpen className="h-8 w-8 text-blue-600" />}
+                            {favorite.item_type === 'guide' && <FileText className="h-8 w-8 text-green-600" />}
+                            {favorite.item_type === 'garden' && <Sprout className="h-8 w-8 text-green-600" />}
+                            {favorite.item_type === 'event' && <Calendar className="h-8 w-8 text-orange-600" />}
+                            <div>
+                              <p className="font-medium">{favorite.item_type} #{favorite.item_id}</p>
+                              <p className="text-sm text-muted-foreground">
+                                Ajouté le {new Date(favorite.created_at).toLocaleDateString('fr-FR')}
+                              </p>
+                            </div>
+                          </div>
+                          <Button variant="ghost" size="sm">
+                            <ExternalLink className="h-4 w-4" />
+                          </Button>
                         </div>
-                      </div>
-                      <Button variant="ghost" size="sm">
-                        <ExternalLink className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <div className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex items-center gap-4">
-                        <Video className="h-8 w-8 text-red-600" />
-                        <div>
-                          <p className="font-medium">Atelier Compostage</p>
-                          <p className="text-sm text-muted-foreground">Vidéo • Ajouté le 8 mars 2024</p>
-                        </div>
-                      </div>
-                      <Button variant="ghost" size="sm">
-                        <ExternalLink className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <div className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex items-center gap-4">
-                        <FileText className="h-8 w-8 text-green-600" />
-                        <div>
-                          <p className="font-medium">Calendrier Lunaire</p>
-                          <p className="text-sm text-muted-foreground">Document • Ajouté le 5 mars 2024</p>
-                        </div>
-                      </div>
-                      <Button variant="ghost" size="sm">
-                        <ExternalLink className="h-4 w-4" />
-                      </Button>
-                    </div>
+                      ))
+                    )}
                   </div>
                 </CardContent>
               </Card>
