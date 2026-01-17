@@ -11,6 +11,7 @@ const HeroSection = () => {
           backgroundImage: `url(${heroImage})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
+          filter: 'brightness(0.7)',
         }}
       >
         <div className="absolute inset-0 bg-gradient-to-r from-background/10 via-background/0 to-background/10" />

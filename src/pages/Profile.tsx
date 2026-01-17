@@ -20,6 +20,7 @@ import { useAuth } from "@/contexts/AuthContextBase";
 import { usePreferences } from "@/contexts/PreferencesContext";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useActivities } from "@/hooks/useActivities";
+import { UpdateProfileData } from "@/contexts/authTypes";
 import { toast } from "sonner";
 
 const Profile = () => {
@@ -111,15 +112,23 @@ const Profile = () => {
   const handleSave = async () => {
     setIsLoading(true);
     try {
-      await updateProfile({
-        firstName: userInfo.firstName,
-        lastName: userInfo.lastName,
-        bio: userInfo.bio,
-        location: userInfo.address, // Assuming address maps to location
-        region: preferences.region,
-        profilePictureUrl: profileImage,
-        phone: userInfo.phone,
-      });
+      const updateData: UpdateProfileData = {};
+
+      // Only include non-empty fields
+      if (userInfo.firstName.trim()) updateData.firstName = userInfo.firstName.trim();
+      if (userInfo.lastName.trim()) updateData.lastName = userInfo.lastName.trim();
+      if (userInfo.bio.trim()) updateData.bio = userInfo.bio.trim();
+      if (userInfo.address.trim()) updateData.location = userInfo.address.trim();
+      if (preferences.region.trim()) updateData.region = preferences.region.trim();
+      if (userInfo.phone.trim()) updateData.phone = userInfo.phone.trim();
+
+      // Only include profilePictureUrl if it's not the default placeholder
+      if (profileImage !== "/photo-profil.jpg") {
+        updateData.profilePictureUrl = profileImage;
+      }
+
+      console.log("Sending update data:", updateData);
+      await updateProfile(updateData);
       toast.success("Profil mis à jour avec succès");
       setIsEditing(false);
     } catch (error) {
