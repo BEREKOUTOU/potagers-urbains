@@ -19,6 +19,15 @@ import photoRoutes from './routes/photos.ts';
 import statRoutes from './routes/stats.ts';
 import { errorHandler } from './middleware/errorHandler.ts';
 
+// --- Env validation (early exit on missing critical secrets) ---
+const requiredRuntimeEnv = ['JWT_SECRET'];
+const missingRuntime = requiredRuntimeEnv.filter((k) => !process.env[k]);
+
+if (missingRuntime.length > 0) {
+  console.error(`Missing required runtime environment variables: ${missingRuntime.join(', ')}`);
+  process.exit(1);
+}
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
