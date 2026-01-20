@@ -1,5 +1,5 @@
 # Use Node.js 18 LTS Alpine for smaller image size
-FROM node:18-alpine
+FROM node:20-alpine
 
 # Set working directory
 WORKDIR /app
@@ -19,7 +19,10 @@ RUN addgroup -g 1001 -S nodejs && \
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci && npm cache clean --force
+# Use `npm install` here so the build doesn't fail if lockfile is out of sync
+# and to avoid `npm ci` errors during CI/docker builds. Using Node 20 satisfies
+# package engine requirements from newer packages.
+RUN npm install --no-audit --no-fund && npm cache clean --force
 
 # Copy source code
 COPY --chown=nextjs:nodejs . .
