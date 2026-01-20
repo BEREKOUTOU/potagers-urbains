@@ -1,20 +1,9 @@
 module.exports = {
-  preset: 'ts-jest',
+  preset: 'ts-jest/presets/default-esm',
   testEnvironment: 'node',
   roots: ['<rootDir>/src'],
   testMatch: ['**/__tests__/**/*.ts', '**/?(*.)+(spec|test).ts'],
-  transform: {
-    '^.+\\.ts$': [
-      'ts-jest',
-      {
-        useESM: true,
-        tsconfig: '<rootDir>/tsconfig.json',
-        diagnostics: {
-          ignoreCodes: [151002]
-        }
-      }
-    ],
-  },
+  extensionsToTreatAsEsm: ['.ts'],
   collectCoverageFrom: [
     'src/**/*.ts',
     '!src/**/*.d.ts',
