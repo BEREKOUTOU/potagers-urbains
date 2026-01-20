@@ -19,7 +19,7 @@ RUN addgroup -g 1001 -S nodejs && \
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci --only=production && npm cache clean --force
+RUN npm ci && npm cache clean --force
 
 # Copy source code
 COPY --chown=nextjs:nodejs . .
