@@ -31,8 +31,8 @@ export function activityLoggerMiddleware(activityType: string, getDescription: (
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const authReq = req as AuthRequest;
     
-    const originalJson = res.json.bind(res);
-    res.json = function(body: any) {
+    const originalJson = res.json.bind(res) as unknown as (body: unknown) => Response;
+    res.json = function(body: unknown) {
       if (authReq.user && res.statusCode >= 200 && res.statusCode < 300) {
         const description = getDescription(authReq);
         logActivity(authReq.user.id, activityType, description).catch(err => {

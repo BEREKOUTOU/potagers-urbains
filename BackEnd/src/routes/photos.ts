@@ -1,7 +1,10 @@
 import express from 'express';
+import * as Express from 'express';
+import multer, { Multer } from 'multer';
+import type { MulterFile } from '../config/multer.ts';
 import { pool } from '../config/database.ts';
 import { authenticateToken } from '../middleware/auth.ts';
-import { upload } from '../config/multer.ts';
+import { upload, validateFileContent, scanFileAntivirus } from '../config/multer.ts';
 
 type AuthRequest = express.Request & {
   user?: {
@@ -9,6 +12,15 @@ type AuthRequest = express.Request & {
     username: string;
     role: string;
   };
+};
+
+type PhotoUploadRequest = express.Request & {
+  user: {
+    id: number;
+    username: string;
+    role: string;
+  };
+  file?: MulterFile;
 };
 
 const router = express.Router();
@@ -91,10 +103,12 @@ router.get('/:id', async (req, res): Promise<void> => {
 });
 
 // Upload new photo
-router.post('/', authenticateToken, upload.single('photo'), async (req, res): Promise<void> => {
+const uploadPhotoHandler = async (req: express.Request, res: express.Response): Promise<void> => {
   try {
-    const userId = (req as AuthRequest).user!.id;
-    const { title, description, gardenId, tags, isPublic } = req.body;
+    const authReq = req as PhotoUploadRequest;
+    const userId = authReq.user.id;
+    const body = authReq.body as { title: string; description: string; gardenId?: string; tags?: string; isPublic?: string };
+    const { title, description, gardenId, tags, isPublic } = body;
 
     // Check if file was uploaded
     if (!req.file) {
@@ -135,7 +149,9 @@ router.post('/', authenticateToken, upload.single('photo'), async (req, res): Pr
     console.error('Upload photo error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
-});
+};
+
+router.post('/', authenticateToken, upload.single('photo'), validateFileContent, scanFileAntivirus, uploadPhotoHandler);
 
 // Update photo
 router.put('/:id', authenticateToken, async (req, res): Promise<void> => {
