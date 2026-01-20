@@ -10,7 +10,7 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "npm run test --prefix BackEnd"
+    "test": "cd BackEnd && npm test"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
