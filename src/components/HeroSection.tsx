@@ -24,7 +24,7 @@ const HeroSection = () => {
         <p className="text-xl md:text-2xl text-white/90 mb-12 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-100">
           Connectez vos jardins, suivez vos cultures en temps réel et rejoignez une communauté passionnée d'agriculture urbaine
         </p>
-        <div className="flex gap-4 justify-center animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300">
+        <div className="flex gap-4 justify-center animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300 flex-wrap">
           <Link to="/inscription">
             <AnimatedButton
               className="bg-green-500 text-white "
