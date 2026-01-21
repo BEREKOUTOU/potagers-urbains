@@ -3,7 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, type ComponentType } from "react";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { PreferencesProvider } from "@/contexts/PreferencesContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -31,6 +31,12 @@ const CreateEvent = lazy(() => import("./pages/CreateEvent"));
 const SharePhoto = lazy(() => import("./pages/SharePhoto"));
 const GuideDetail = lazy(() => import("./pages/GuideDetail"));
 const CreateSharedGarden = lazy(() => import("./pages/CreateSharedGarden"));
+const AuthCallback = lazy(() =>
+  import("./pages/AuthCallback").then(
+    (mod) =>
+      ({ default: (mod as { AuthCallback: ComponentType<Record<string, unknown>> }).AuthCallback })
+  )
+);
 
 const queryClient = new QueryClient();
 
@@ -96,6 +102,8 @@ const App = () => (
               } />
               <Route path="/inscription" element={<Signup />} />
               <Route path="/connexion" element={<Login />} />
+              <Route path="/auth/google/callback" element={<AuthCallback />} />
+              <Route path="/auth/facebook/callback" element={<AuthCallback />} />
               <Route path="/decouvrir-jardins" element={<DiscoverGardens />} />
               <Route path="/rejoindre-jardin/:id" element={<JoinGarden />} />
               <Route path="/jardin/:id" element={<GardenDetails />} />

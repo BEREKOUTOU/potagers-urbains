@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,7 +9,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContextBase";
 import { toast } from "sonner";
 
-const Login = () => {
+const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -55,36 +55,33 @@ const Login = () => {
     }
   };
 
-  const handleGoogleLogin = async () => {
-    setIsLoading(true);
-    try {
-      // Simulate OAuth flow - replace with actual Google OAuth implementation
-      console.log("Initiating Google OAuth login...");
-      // In a real implementation, this would redirect to Google OAuth
-      // window.location.href = 'https://accounts.google.com/oauth/authorize?...';
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API call
-      console.log("Google OAuth login completed");
-    } catch (error) {
-      console.error("Google OAuth login failed:", error);
-    } finally {
-      setIsLoading(false);
+  const handleGoogleLogin = () => {
+    // Redirect to Google OAuth (guard if env var missing)
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    if (!clientId) {
+      toast.error("Google OAuth not configured. Set VITE_GOOGLE_CLIENT_ID in your .env");
+      console.error("Missing VITE_GOOGLE_CLIENT_ID for Google OAuth");
+      return;
     }
+
+    const redirectUri = import.meta.env.VITE_GOOGLE_REDIRECT_URI || window.location.origin + '/auth/google/callback';
+    // Use Google's recommended v2 endpoint and include openid scope
+    const googleOAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=openid%20email%20profile&access_type=offline&prompt=consent`;
+    window.location.href = googleOAuthUrl;
   };
 
-  const handleFacebookLogin = async () => {
-    setIsLoading(true);
-    try {
-      // Simulate OAuth flow - replace with actual Facebook OAuth implementation
-      console.log("Initiating Facebook OAuth login...");
-      // In a real implementation, this would redirect to Facebook OAuth
-      // window.location.href = 'https://www.facebook.com/v12.0/dialog/oauth?...';
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API call
-      console.log("Facebook OAuth login completed");
-    } catch (error) {
-      console.error("Facebook OAuth login failed:", error);
-    } finally {
-      setIsLoading(false);
+  const handleFacebookLogin = () => {
+    // Redirect to Facebook OAuth (guard if env var missing)
+    const fbAppId = import.meta.env.VITE_FACEBOOK_APP_ID;
+    if (!fbAppId) {
+      toast.error("Facebook OAuth not configured. Set VITE_FACEBOOK_APP_ID in your .env");
+      console.error("Missing VITE_FACEBOOK_APP_ID for Facebook OAuth");
+      return;
     }
+
+    const fbRedirect = import.meta.env.VITE_FACEBOOK_REDIRECT_URI || window.location.origin + '/auth/facebook/callback';
+    const facebookOAuthUrl = `https://www.facebook.com/v12.0/dialog/oauth?client_id=${fbAppId}&redirect_uri=${encodeURIComponent(fbRedirect)}&response_type=code&scope=email,public_profile`;
+    window.location.href = facebookOAuthUrl;
   };
 
   return (
@@ -207,7 +204,7 @@ const Login = () => {
                   {isLoading ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   ) : (
-                    <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
+                    <svg className="mr-2 h-4 w-4 text-red-600" viewBox="0 0 24 24">
                       <path
                         fill="currentColor"
                         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -237,7 +234,7 @@ const Login = () => {
                   {isLoading ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   ) : (
-                    <svg className="mr-2 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                    <svg className="mr-2 h-4 w-4 text-sky-600" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                     </svg>
                   )}

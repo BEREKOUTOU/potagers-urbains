@@ -240,4 +240,162 @@ router.put('/profile', authenticateToken, validate(updateProfileSchema), async (
   }
 });
 
+// Google OAuth callback
+router.get('/google/callback', async (req, res): Promise<void> => {
+  try {
+    const { code, error } = req.query;
+
+    if (error) {
+      res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/auth/google/callback?error=${error}`);
+      return;
+    }
+
+    if (!code) {
+      res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/auth/google/callback?error=no_code`);
+      return;
+    }
+
+    // Exchange code for access token
+    const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        client_id: process.env.GOOGLE_CLIENT_ID!,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+        code: code as string,
+        grant_type: 'authorization_code',
+        redirect_uri: process.env.GOOGLE_REDIRECT_URI!,
+      }),
+    });
+
+    const tokenData = await tokenResponse.json() as { access_token: string };
+
+    if (!tokenResponse.ok) {
+      res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/auth/google/callback?error=token_exchange_failed`);
+      return;
+    }
+
+    // Get user info from Google
+    const userResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+      headers: {
+        'Authorization': `Bearer ${tokenData.access_token}`,
+      },
+    });
+
+    const googleUser = await userResponse.json() as { email: string; given_name?: string; family_name?: string; picture?: string };
+
+    if (!userResponse.ok) {
+      res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/auth/google/callback?error=user_info_failed`);
+      return;
+    }
+
+    // Check if user exists, if not create them
+    let user = await pool.query(
+      'SELECT id, username, email, first_name, last_name, profile_picture_url FROM users WHERE email = $1',
+      [googleUser.email]
+    );
+
+    if (user.rows.length === 0) {
+      // Create new user
+      const username = googleUser.email.split('@')[0] + Math.random().toString(36).substring(2, 8);
+      user = await pool.query(
+        `INSERT INTO users (username, email, first_name, last_name, profile_picture_url, password_hash, bio)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)
+         RETURNING id, username, email, first_name, last_name, profile_picture_url`,
+        [username, googleUser.email, googleUser.given_name || '', googleUser.family_name || '', googleUser.picture, 'oauth_user', 'Utilisateur Google']
+      );
+    }
+
+    const dbUser = user.rows[0];
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: dbUser.id, username: dbUser.username, role: 'member' },
+      process.env.JWT_SECRET!,
+      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' } as jwt.SignOptions
+    );
+
+    // Log activity
+    await logActivity(dbUser.id, 'user_login_oauth', `Connexion via Google`);
+
+    // Redirect to frontend with token
+    res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/auth/google/callback?token=${token}&provider=Google`);
+  } catch (error) {
+    console.error('Google OAuth callback error:', error);
+    res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/auth/google/callback?error=server_error`);
+  }
+});
+
+// Facebook OAuth callback
+router.get('/facebook/callback', async (req, res): Promise<void> => {
+  try {
+    const { code, error } = req.query;
+
+    if (error) {
+      res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/auth/facebook/callback?error=${error}`);
+      return;
+    }
+
+    if (!code) {
+      res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/auth/facebook/callback?error=no_code`);
+      return;
+    }
+
+    // Exchange code for access token
+    const tokenResponse = await fetch(`https://graph.facebook.com/v12.0/oauth/access_token?client_id=${process.env.FACEBOOK_APP_ID}&client_secret=${process.env.FACEBOOK_APP_SECRET}&code=${code}&redirect_uri=${encodeURIComponent(process.env.FACEBOOK_REDIRECT_URI!)}`);
+    const tokenData = await tokenResponse.json() as { access_token: string };
+
+    if (!tokenResponse.ok) {
+      res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/auth/facebook/callback?error=token_exchange_failed`);
+      return;
+    }
+
+    // Get user info from Facebook
+    const userResponse = await fetch(`https://graph.facebook.com/me?fields=id,name,email,first_name,last_name,picture&access_token=${tokenData.access_token}`);
+    const facebookUser = await userResponse.json() as { email: string; first_name?: string; last_name?: string; picture?: { data?: { url?: string } } };
+
+    if (!userResponse.ok) {
+      res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/auth/facebook/callback?error=user_info_failed`);
+      return;
+    }
+
+    // Check if user exists, if not create them
+    let user = await pool.query(
+      'SELECT id, username, email, first_name, last_name, profile_picture_url FROM users WHERE email = $1',
+      [facebookUser.email]
+    );
+
+    if (user.rows.length === 0) {
+      // Create new user
+      const username = facebookUser.email.split('@')[0] + Math.random().toString(36).substring(2, 8);
+      user = await pool.query(
+        `INSERT INTO users (username, email, first_name, last_name, profile_picture_url, password_hash, bio)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)
+         RETURNING id, username, email, first_name, last_name, profile_picture_url`,
+        [username, facebookUser.email, facebookUser.first_name || '', facebookUser.last_name || '', facebookUser.picture?.data?.url || '', 'oauth_user', 'Utilisateur Facebook']
+      );
+    }
+
+    const dbUser = user.rows[0];
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: dbUser.id, username: dbUser.username, role: 'member' },
+      process.env.JWT_SECRET!,
+      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' } as jwt.SignOptions
+    );
+
+    // Log activity
+    await logActivity(dbUser.id, 'user_login_oauth', `Connexion via Facebook`);
+
+    // Redirect to frontend with token
+    res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/auth/facebook/callback?token=${token}&provider=Facebook`);
+  } catch (error) {
+    console.error('Facebook OAuth callback error:', error);
+    res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/auth/facebook/callback?error=server_error`);
+  }
+});
+
 export default router;
