@@ -162,6 +162,51 @@ router.put('/:id', authenticateToken, async (req, res): Promise<void> => {
   }
 });
 
+// Delete own account (self-deletion)
+router.delete('/', authenticateToken, async (req, res): Promise<void> => {
+  try {
+    const authReq = req as AuthRequest;
+    if (!authReq.user) {
+      res.status(401).json({ error: 'Authentication required' });
+      return;
+    }
+
+    const userId = authReq.user.id;
+
+    // Start a transaction to ensure all related data is deleted
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+
+      // Delete related data in order
+      await client.query('DELETE FROM favorites WHERE user_id = $1', [userId]);
+      await client.query('DELETE FROM user_gardens WHERE user_id = $1', [userId]);
+      await client.query('DELETE FROM user_preferences WHERE user_id = $1', [userId]);
+      await client.query('DELETE FROM activity_log WHERE user_id = $1', [userId]);
+
+      // Delete the user
+      const result = await client.query('DELETE FROM users WHERE id = $1 RETURNING id', [userId]);
+
+      if (result.rows.length === 0) {
+        await client.query('ROLLBACK');
+        res.status(404).json({ error: 'User not found' });
+        return;
+      }
+
+      await client.query('COMMIT');
+      res.json({ message: 'Account deleted successfully' });
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
+  } catch (error) {
+    console.error('Self-delete user error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Delete user (admin only)
 router.delete('/:id', authenticateToken, requireRole(['admin']), async (req, res): Promise<void> => {
   try {

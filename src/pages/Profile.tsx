@@ -24,13 +24,14 @@ import { UpdateProfileData } from "@/contexts/authTypes";
 import { toast } from "sonner";
 
 const Profile = () => {
-  const { user, updateProfile } = useAuth();
+  const { user, updateProfile, deleteAccount } = useAuth();
   const { preferences: userPreferences, updatePreferences } = usePreferences();
   const { favorites } = useFavorites();
   const { activities } = useActivities();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSavingPreferences, setIsSavingPreferences] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
   const [profileImage, setProfileImage] = useState(user?.profile_picture_url || "/photo-profil.jpg");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [userInfo, setUserInfo] = useState({
@@ -176,6 +177,19 @@ const Profile = () => {
 
   const handleCameraClick = () => {
     fileInputRef.current?.click();
+  };
+
+  const handleDeleteAccount = async () => {
+    setIsDeletingAccount(true);
+    try {
+      await deleteAccount();
+      toast.success("Votre compte a été supprimé avec succès");
+    } catch (error) {
+      console.error("Erreur lors de la suppression du compte:", error);
+      toast.error("Erreur lors de la suppression du compte");
+    } finally {
+      setIsDeletingAccount(false);
+    }
   };
 
   return (
@@ -640,9 +654,20 @@ const Profile = () => {
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Annuler</AlertDialogCancel>
-                      <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                        Supprimer
+                      <AlertDialogCancel disabled={isDeletingAccount}>Annuler</AlertDialogCancel>
+                      <AlertDialogAction
+                        className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        onClick={handleDeleteAccount}
+                        disabled={isDeletingAccount}
+                      >
+                        {isDeletingAccount ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Suppression...
+                          </>
+                        ) : (
+                          "Supprimer"
+                        )}
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>

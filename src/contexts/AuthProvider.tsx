@@ -1,6 +1,6 @@
 import React, { useState, useEffect, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from './authHooks';
+import { AuthContext } from './AuthContextBase';
 import { User, RegisterData, UpdateProfileData, AuthContextType } from './authTypes';
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -138,6 +138,31 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  const deleteAccount = async () => {
+    if (!token || !user) throw new Error('No token or user available');
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/users/`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Account deletion failed');
+      }
+
+      // Clear user data and redirect
+      logout();
+    } catch (error) {
+      console.error('Account deletion error:', error);
+      throw error;
+    }
+  };
+
   const value: AuthContextType = {
     user,
     token,
@@ -146,6 +171,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     register,
     logout,
     updateProfile,
+    deleteAccount,
     isAuthenticated: !!user,
   };
 

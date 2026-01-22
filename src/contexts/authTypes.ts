@@ -43,5 +43,6 @@ export interface AuthContextType {
   register: (userData: RegisterData) => Promise<void>;
   logout: () => void;
   updateProfile: (userData: UpdateProfileData) => Promise<void>;
+  deleteAccount: () => Promise<void>;
   isAuthenticated: boolean;
 }
