@@ -4,9 +4,9 @@ import { Sprout, Calendar, CloudRain } from "lucide-react";
 const DashboardCards = () => {
   return (
     <section className="container py-16">
+      <h1 className="text-2xl font-bold text-foreground flex items-center justify-center pb-0 mb-0">Tableau de bord rapide</h1>
+      <p className="text-muted-foreground mb-6 flex items-center justify-center mt-0 pt-0">Surveillez vos jardins en temps réel</p>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <h1 className="text-2xl font-bold  col-span-3 text-foreground flex items-center justify-center pb-0 mb-0" >Tableau de bord rapide</h1>
-        <p className="text-muted-foreground mb-6 col-span-3 flex items-center justify-center mt-0 pt-0">Surveillez vos jardins en temps réel</p>
         <Card className="border-none shadow-lg hover:shadow-xl transition-all duration-300">
           <CardHeader>
             <div className="flex items-center gap-3">
