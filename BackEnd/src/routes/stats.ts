@@ -160,6 +160,54 @@ router.delete('/:statId', authenticateToken, async (req, res): Promise<void> => 
   }
 });
 
+// Get user statistics
+router.get('/user', authenticateToken, async (req, res): Promise<void> => {
+  try {
+    const userId = (req as AuthRequest).user!.id;
+
+    // Get user's garden count
+    const gardensCreated = await pool.query(
+      'SELECT COUNT(*) as count FROM gardens WHERE created_by = $1',
+      [userId]
+    );
+
+    // Get user's event count
+    const eventsCreated = await pool.query(
+      'SELECT COUNT(*) as count FROM events WHERE created_by = $1',
+      [userId]
+    );
+
+    // Get user's discussion count
+    const discussionsCreated = await pool.query(
+      'SELECT COUNT(*) as count FROM discussions WHERE created_by = $1',
+      [userId]
+    );
+
+    // Get user's resource count
+    const resourcesCreated = await pool.query(
+      'SELECT COUNT(*) as count FROM resources WHERE author_id = $1',
+      [userId]
+    );
+
+    // Get user's joined gardens count
+    const gardensJoined = await pool.query(
+      'SELECT COUNT(*) as count FROM user_gardens WHERE user_id = $1 AND is_active = true',
+      [userId]
+    );
+
+    res.json({
+      gardens_created: parseInt(gardensCreated.rows[0].count),
+      events_created: parseInt(eventsCreated.rows[0].count),
+      discussions_created: parseInt(discussionsCreated.rows[0].count),
+      resources_created: parseInt(resourcesCreated.rows[0].count),
+      gardens_joined: parseInt(gardensJoined.rows[0].count),
+    });
+  } catch (error) {
+    console.error('Get user stats error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Get aggregated stats for dashboard
 router.get('/dashboard/:gardenId', authenticateToken, async (req, res): Promise<void> => {
   try {

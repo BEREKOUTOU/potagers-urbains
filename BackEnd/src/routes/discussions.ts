@@ -103,6 +103,11 @@ router.post('/', authenticateToken, async (req, res) => {
     const userId = user.id;
     const { title, content, gardenId, category, isPinned } = req.body;
 
+    // Validate required fields
+    if (!title || !content) {
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
     // If gardenId is provided, check if user is a member of that garden
     if (gardenId) {
       const membershipCheck = await pool.query(
@@ -145,7 +150,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
     const userId = user.id;
     const { title, content, category, isPinned } = req.body;
 
-    // Check if user created the discussion or is admin/moderator
+    // Check if user created the discussion or is admin
     const discussionCheck = await pool.query(
       'SELECT author_id FROM discussions WHERE id = $1',
       [id]
@@ -156,9 +161,9 @@ router.put('/:id', authenticateToken, async (req, res) => {
     }
 
     const isAuthor = discussionCheck.rows[0].author_id === userId;
-    const isModerator = user.role === 'moderator' || user.role === 'admin';
+    const isAdmin = user.role === 'admin';
 
-    if (!isAuthor && !isModerator) {
+    if (!isAuthor && !isAdmin) {
       return res.status(403).json({ error: 'Access denied' });
     }
 
@@ -190,7 +195,7 @@ router.delete('/:id', authenticateToken, async (req, res) => {
     }
     const userId = user.id;
 
-    // Check if user created the discussion or is admin/moderator
+    // Check if user created the discussion or is admin
     const discussionCheck = await pool.query(
       'SELECT author_id FROM discussions WHERE id = $1',
       [id]
@@ -201,9 +206,9 @@ router.delete('/:id', authenticateToken, async (req, res) => {
     }
 
     const isAuthor = discussionCheck.rows[0].author_id === userId;
-    const isModerator = user.role === 'moderator' || user.role === 'admin';
+    const isAdmin = user.role === 'admin';
 
-    if (!isAuthor && !isModerator) {
+    if (!isAuthor && !isAdmin) {
       return res.status(403).json({ error: 'Access denied' });
     }
 
@@ -216,6 +221,43 @@ router.delete('/:id', authenticateToken, async (req, res) => {
   } catch (error) {
     console.error('Delete discussion error:', error);
     return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Add reply to discussion
+router.post('/:id/reply', authenticateToken, async (req, res): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const userId = (req as AuthRequest).user!.id;
+    const { content } = req.body;
+
+    // Check if discussion exists
+    const discussionCheck = await pool.query(
+      'SELECT id FROM discussions WHERE id = $1',
+      [id]
+    );
+
+    if (discussionCheck.rows.length === 0) {
+      res.status(404).json({ error: 'Discussion not found' });
+      return;
+    }
+
+    const result = await pool.query(
+      `INSERT INTO discussion_replies (discussion_id, user_id, content)
+       VALUES ($1, $2, $3)
+       RETURNING *`,
+      [id, userId, content]
+    );
+
+    const reply = result.rows[0];
+
+    res.status(201).json({
+      message: 'Reply added successfully',
+      reply
+    });
+  } catch (error) {
+    console.error('Add reply error:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 

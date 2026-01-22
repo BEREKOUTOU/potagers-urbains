@@ -19,3 +19,15 @@ jest.mock('../config/database.ts', () => ({
     end: jest.fn(),
   },
 }));
+
+// Mock JWT for tests
+jest.mock('jsonwebtoken', () => ({
+  verify: jest.fn((token, secret, callback) => {
+    if (token === 'validtoken') {
+      callback(null, { id: 1, username: 'testuser', role: 'user' });
+    } else {
+      callback(new Error('Invalid token'), null);
+    }
+  }),
+  sign: jest.fn(() => 'validtoken'),
+}));

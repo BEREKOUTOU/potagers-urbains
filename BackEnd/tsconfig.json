@@ -29,6 +29,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "rewriteRelativeImportExtensions": true,
+    "allowImportingTsExtensions": true,
     "noEmit": false
   },
   "isolatedModules": true,

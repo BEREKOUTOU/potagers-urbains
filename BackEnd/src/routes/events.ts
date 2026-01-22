@@ -86,6 +86,12 @@ router.post('/', authenticateToken, async (req, res): Promise<void> => {
     const userId = (req as AuthRequest).user!.id;
     const { title, description, startDate, endDate, location, gardenId, maxAttendees, eventType, isPublic } = req.body;
 
+    // Validate required fields
+    if (!title || !description || !startDate || !endDate || !location) {
+      res.status(400).json({ error: 'Missing required fields' });
+      return;
+    }
+
     // If gardenId is provided, check if user is a member of that garden
     if (gardenId) {
       const membershipCheck = await pool.query(
@@ -234,6 +240,61 @@ router.post('/:id/rsvp', authenticateToken, async (req, res): Promise<void> => {
     res.json({ message: 'RSVP updated successfully' });
   } catch (error) {
     console.error('RSVP error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Attend event
+router.post('/:id/attend', authenticateToken, async (req, res): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const userId = (req as AuthRequest).user!.id;
+
+    // Check if event exists
+    const eventCheck = await pool.query(
+      'SELECT id, capacity, attendee_count FROM events WHERE id = $1',
+      [id]
+    );
+
+    if (eventCheck.rows.length === 0) {
+      res.status(404).json({ error: 'Event not found' });
+      return;
+    }
+
+    const event = eventCheck.rows[0];
+
+    // Check if event is at capacity
+    if (event.capacity && event.attendee_count >= event.capacity) {
+      res.status(400).json({ error: 'Event is at capacity' });
+      return;
+    }
+
+    // Check if user is already attending
+    const attendanceCheck = await pool.query(
+      'SELECT id FROM event_attendees WHERE event_id = $1 AND user_id = $2',
+      [id, userId]
+    );
+
+    if (attendanceCheck.rows.length > 0) {
+      res.status(400).json({ error: 'Already attending this event' });
+      return;
+    }
+
+    // Add user as attendee
+    await pool.query(
+      'INSERT INTO event_attendees (event_id, user_id, rsvp_status) VALUES ($1, $2, $3)',
+      [id, userId, 'attending']
+    );
+
+    // Update attendee count
+    await pool.query(
+      'UPDATE events SET attendee_count = attendee_count + 1 WHERE id = $1',
+      [id]
+    );
+
+    res.status(200).json({ message: 'Successfully added as attendee' });
+  } catch (error) {
+    console.error('Attend event error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

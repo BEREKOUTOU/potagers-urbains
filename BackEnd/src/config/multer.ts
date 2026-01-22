@@ -1,4 +1,10 @@
 import multer from 'multer';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import fs from 'fs';
+import express, { Request, Response, NextFunction } from 'express';
+import * as Express from 'express';
+import ClamAV from 'clamav.js';
 
 export interface MulterFile {
   fieldname: string;
@@ -11,16 +17,10 @@ export interface MulterFile {
   path?: string;
   buffer?: Buffer;
 }
-import path from 'path';
-import { fileURLToPath } from 'url';
-import fs from 'fs';
-import express, { Request, Response, NextFunction } from 'express';
-import * as Express from 'express';
-import ClamAV from 'clamav.js';
 
 // Get __dirname equivalent for ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __filenameMulter = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filenameMulter);
 
 // Allowed file types with magic bytes
 const ALLOWED_TYPES = {
@@ -191,5 +191,3 @@ export const scanFileAntivirus = async (req: Request, res: Response, next: NextF
     res.status(500).json({ error: 'File security scan failed' });
   }
 };
-
-// `MulterFile` interface is exported above for use in other modules
