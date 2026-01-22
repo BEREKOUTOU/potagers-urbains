@@ -1,5 +1,4 @@
 /// <reference types="jest" />
-/// <reference types="@testing-library/jest-dom" />
 
 import '@testing-library/jest-dom';
 
@@ -24,9 +23,11 @@ const localStorageMock = {
   setItem: jest.fn(),
   removeItem: jest.fn(),
   clear: jest.fn(),
+  length: 0,
+  key: jest.fn(),
 };
 
-global.localStorage = localStorageMock as any;
+global.localStorage = localStorageMock as Storage;
 
 // Mock fetch if not available
 if (!global.fetch) {
@@ -36,7 +37,7 @@ if (!global.fetch) {
 // Suppress console errors in tests
 const originalError = console.error;
 beforeAll(() => {
-  console.error = (...args: any[]) => {
+  console.error = (...args: unknown[]) => {
     if (
       typeof args[0] === 'string' &&
       (args[0].includes('Warning: ReactDOM.render') ||
